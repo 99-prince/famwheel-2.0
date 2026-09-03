@@ -41,17 +41,11 @@
       <div class="grid-2" style="margin-bottom:22px;">
         <div style="background:linear-gradient(135deg,#dcfce7,#bbf7d0);border-radius:16px;padding:20px 24px;border:1px solid #86efac;">
           <div style="font-size:0.75rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">📈 Top Gainers Today</div>
-          ${FamData.getMarketPrices().filter(p=>p.current>p.prev).sort((a,b)=>((b.current-b.prev)/b.prev)-((a.current-a.prev)/a.prev)).slice(0,3).map(p=>{
-            const change = ((p.current-p.prev)/p.prev*100).toFixed(1);
-            return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="font-size:1.3rem;">${p.emoji}</span><span style="font-size:0.88rem;font-weight:700;color:#111;flex:1;">${p.name}</span><span style="font-size:0.88rem;font-weight:800;color:#16a34a;">▲ ${change}%</span></div>`;
-          }).join('')}
+          <div id="topGainers"></div>
         </div>
         <div style="background:linear-gradient(135deg,#fee2e2,#fecaca);border-radius:16px;padding:20px 24px;border:1px solid #fca5a5;">
           <div style="font-size:0.75rem;font-weight:700;color:#dc2626;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">📉 Top Losers Today</div>
-          ${FamData.getMarketPrices().filter(p=>p.current<p.prev).sort((a,b)=>((a.current-a.prev)/a.prev)-((b.current-b.prev)/b.prev)).slice(0,3).map(p=>{
-            const change = ((p.current-p.prev)/p.prev*100).toFixed(1);
-            return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="font-size:1.3rem;">${p.emoji}</span><span style="font-size:0.88rem;font-weight:700;color:#111;flex:1;">${p.name}</span><span style="font-size:0.88rem;font-weight:800;color:#dc2626;">▼ ${Math.abs(change)}%</span></div>`;
-          }).join('')}
+          <div id="topLosers"></div>
         </div>
       </div>
 
@@ -80,6 +74,22 @@
 const user = Auth.requireAuth();
 renderSidebar('market-prices');
 renderDashHeader('📊 Market Prices', 'Live crop commodity rates across India');
+
+function renderBanners() {
+  const prices = FamData.getMarketPrices();
+  const gainers = prices.filter(p=>p.current>p.prev).sort((a,b)=>((b.current-b.prev)/b.prev)-((a.current-a.prev)/a.prev)).slice(0,3);
+  document.getElementById('topGainers').innerHTML = gainers.map(p=>{
+    const change = ((p.current-p.prev)/p.prev*100).toFixed(1);
+    return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:8px 12px;background:rgba(255,255,255,0.5);border-radius:10px;box-shadow:0 2px 5px rgba(22,163,74,0.08);"><span style="font-size:1.3rem;">${p.emoji}</span><span style="font-size:0.88rem;font-weight:700;color:#111;flex:1;">${p.name}</span><span style="font-size:0.88rem;font-weight:800;color:#16a34a;">▲ ${change}%</span></div>`;
+  }).join('');
+  
+  const losers = prices.filter(p=>p.current<p.prev).sort((a,b)=>((a.current-a.prev)/a.prev)-((b.current-b.prev)/b.prev)).slice(0,3);
+  document.getElementById('topLosers').innerHTML = losers.map(p=>{
+    const change = ((p.current-p.prev)/p.prev*100).toFixed(1);
+    return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:8px 12px;background:rgba(255,255,255,0.5);border-radius:10px;box-shadow:0 2px 5px rgba(220,38,38,0.08);"><span style="font-size:1.3rem;">${p.emoji}</span><span style="font-size:0.88rem;font-weight:700;color:#111;flex:1;">${p.name}</span><span style="font-size:0.88rem;font-weight:800;color:#dc2626;">▼ ${Math.abs(change)}%</span></div>`;
+  }).join('');
+}
+renderBanners();
 
 function renderPrices() {
   const search = document.getElementById('priceSearch').value.toLowerCase();

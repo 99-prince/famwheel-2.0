@@ -11,7 +11,7 @@ call npm install
 if %errorlevel% neq 0 (echo ERROR: npm install failed in server && pause && exit /b 1)
 
 echo.
-echo [2/4] Setting up database...
+echo [2/4] Setting up PostgreSQL database...
 call npx prisma generate
 call npx prisma db push
 if %errorlevel% neq 0 (echo ERROR: Database setup failed && pause && exit /b 1)

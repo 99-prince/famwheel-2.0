@@ -10,6 +10,7 @@
     "dev:server": "npm run --prefix server dev",
     "dev:client": "npm run --prefix client dev",
     "start:server": "npm run --prefix server start",
+    "start": "npm run start:server",
     "build:client": "npm run --prefix client build"
   }
 }

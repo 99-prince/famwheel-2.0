@@ -118,6 +118,13 @@ router.post('/', authenticate, requireRole('BUYER', 'ADMIN'), async (req, res) =
     }
 
     const qty = parseFloat(quantity);
+    const unitPrice = parseFloat(pricePerUnit);
+    if (!Number.isFinite(qty) || !Number.isFinite(unitPrice) || qty <= 0 || unitPrice <= 0) {
+      return res.status(400).json({ success: false, error: 'quantity and pricePerUnit must be positive numbers' });
+    }
+    if (crop.farmerId === req.user.id) {
+      return res.status(400).json({ success: false, error: 'You cannot order your own crop' });
+    }
     if (qty < crop.minOrderQty) {
       return res.status(400).json({ success: false, error: `Minimum order is ${crop.minOrderQty} ${crop.unit}` });
     }
@@ -125,24 +132,24 @@ router.post('/', authenticate, requireRole('BUYER', 'ADMIN'), async (req, res) =
       return res.status(400).json({ success: false, error: `Only ${crop.quantity} ${crop.unit} available` });
     }
 
-    const totalAmount = qty * parseFloat(pricePerUnit);
-
-    const order = await prisma.order.create({
-      data: {
-        cropId: parseInt(cropId),
-        farmerId: crop.farmerId,
-        buyerId: req.user.id,
-        quantity: qty,
-        pricePerUnit: parseFloat(pricePerUnit),
-        totalAmount,
-        deliveryAddress,
-        notes,
-      },
-      include: {
-        crop:   { select: { name: true, emoji: true, unit: true } },
-        farmer: { select: { firstName: true, lastName: true } },
-        buyer:  { select: { firstName: true, lastName: true } },
-      },
+    const totalAmount = qty * unitPrice;
+    const order = await prisma.$transaction(async (tx) => {
+      const reserved = await tx.crop.updateMany({
+        where: { id: crop.id, isAvailable: true, quantity: { gte: qty } },
+        data: { quantity: { decrement: qty } },
+      });
+      if (reserved.count !== 1) throw Object.assign(new Error('Crop stock changed; please retry'), { status: 409 });
+      return tx.order.create({
+        data: {
+          cropId: crop.id, farmerId: crop.farmerId, buyerId: req.user.id,
+          quantity: qty, pricePerUnit: unitPrice, totalAmount, deliveryAddress, notes,
+        },
+        include: {
+          crop: { select: { name: true, emoji: true, unit: true } },
+          farmer: { select: { firstName: true, lastName: true } },
+          buyer: { select: { firstName: true, lastName: true } },
+        },
+      });
     });
 
     // Notify farmer
@@ -162,7 +169,7 @@ router.post('/', authenticate, requireRole('BUYER', 'ADMIN'), async (req, res) =
     res.status(201).json({ success: true, order });
   } catch (err) {
     console.error('Create order error:', err);
-    res.status(500).json({ success: false, error: 'Failed to create order' });
+    res.status(err.status || 500).json({ success: false, error: err.status ? err.message : 'Failed to create order' });
   }
 });
 
@@ -179,12 +186,16 @@ router.patch('/:id/status', authenticate, async (req, res) => {
     const order = await prisma.order.findUnique({ where: { id: req.params.id } });
     if (!order) return res.status(404).json({ success: false, error: 'Order not found' });
 
-    const canUpdate = order.farmerId === req.user.id || order.buyerId === req.user.id || req.user.role === 'ADMIN';
+    const requestedStatus = status.toUpperCase();
+    const canUpdate =
+      req.user.role === 'ADMIN' ||
+      (order.farmerId === req.user.id && ['CONFIRMED', 'IN_TRANSIT', 'DELIVERED', 'CANCELLED'].includes(requestedStatus)) ||
+      (order.buyerId === req.user.id && ['CANCELLED'].includes(requestedStatus));
     if (!canUpdate) return res.status(403).json({ success: false, error: 'Access denied' });
 
     const updated = await prisma.order.update({
       where: { id: req.params.id },
-      data:  { status: status.toUpperCase() },
+      data:  { status: requestedStatus },
     });
 
     // Notify the other party

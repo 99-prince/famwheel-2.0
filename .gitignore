@@ -1,0 +1,11 @@
+server/.env
+client/.env
+server/node_modules/
+client/node_modules/
+client/dist/
+client/*.tsbuildinfo
+client/src/**/*.js
+client/src/**/*.d.ts
+client/vite.config.js
+client/vite.config.d.ts
+*.db

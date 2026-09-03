@@ -27,7 +27,7 @@ npx prisma generate
 npx prisma db push
 ```
 
-This creates the SQLite database file at `server/famwheel.db` with all tables.
+This creates the configured PostgreSQL schema with all tables. Set `DATABASE_URL` in `server/.env` first.
 
 ---
 
@@ -54,7 +54,7 @@ You'll see:
 ```
 🚜  FAM WHEEL API Server Started!
 🌐 Server  : http://localhost:5000
-🗄️  Database: SQLite (famwheel.db)
+🗄️  Database: PostgreSQL
 📡 Socket  : Socket.IO enabled
 ```
 

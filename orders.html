@@ -18,11 +18,12 @@
 
       <!-- STATUS TABS -->
       <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
-        ${['all','pending','confirmed','in_transit','delivered','cancelled'].map((s,i) => `
-          <button onclick="filterOrders('${s}')" class="status-tab" data-status="${s}" style="padding:8px 18px;border-radius:99px;border:1.5px solid ${i===0?'#22c55e':'#e5e7eb'};background:${i===0?'#22c55e':'#fff'};color:${i===0?'#fff':'#6b7280'};font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;">
-            ${s.replace('_',' ').replace(/\b\w/g,l=>l.toUpperCase())}
-          </button>
-        `).join('')}
+        <button onclick="filterOrders('all')" class="status-tab" data-status="all" style="padding:8px 18px;border-radius:99px;border:1.5px solid #22c55e;background:#22c55e;color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;box-shadow:0 2px 5px rgba(34,197,94,0.3);">All</button>
+        <button onclick="filterOrders('pending')" class="status-tab" data-status="pending" style="padding:8px 18px;border-radius:99px;border:1.5px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;box-shadow:0 2px 5px rgba(0,0,0,0.05);">Pending</button>
+        <button onclick="filterOrders('confirmed')" class="status-tab" data-status="confirmed" style="padding:8px 18px;border-radius:99px;border:1.5px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;box-shadow:0 2px 5px rgba(0,0,0,0.05);">Confirmed</button>
+        <button onclick="filterOrders('in_transit')" class="status-tab" data-status="in_transit" style="padding:8px 18px;border-radius:99px;border:1.5px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;box-shadow:0 2px 5px rgba(0,0,0,0.05);">In Transit</button>
+        <button onclick="filterOrders('delivered')" class="status-tab" data-status="delivered" style="padding:8px 18px;border-radius:99px;border:1.5px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;box-shadow:0 2px 5px rgba(0,0,0,0.05);">Delivered</button>
+        <button onclick="filterOrders('cancelled')" class="status-tab" data-status="cancelled" style="padding:8px 18px;border-radius:99px;border:1.5px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;box-shadow:0 2px 5px rgba(0,0,0,0.05);">Cancelled</button>
       </div>
 
       <!-- STATS -->

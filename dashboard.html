@@ -109,9 +109,9 @@ content.innerHTML = `
     <div class="card-header">
       <h3>📈 Revenue This Week</h3>
       <div style="display:flex;gap:6px;">
-        <button onclick="this.style.background='#22c55e';this.style.color='#fff';document.querySelectorAll(\".chart-period\").forEach(b=>b!==this&&(b.style.background=\"\",b.style.color=\"\"))" class="chart-period btn btn-sm btn-outline" style="background:#22c55e;color:#fff;">Week</button>
-        <button onclick="this.style.background='#22c55e';this.style.color='#fff';document.querySelectorAll(\".chart-period\").forEach(b=>b!==this&&(b.style.background=\"\",b.style.color=\"\"))" class="chart-period btn btn-sm btn-outline">Month</button>
-        <button onclick="this.style.background='#22c55e';this.style.color='#fff';document.querySelectorAll(\".chart-period\").forEach(b=>b!==this&&(b.style.background=\"\",b.style.color=\"\"))" class="chart-period btn btn-sm btn-outline">Year</button>
+        <button onclick="this.style.background='#22c55e';this.style.color='#fff';document.querySelectorAll('.chart-period').forEach(b=>b!==this&&(b.style.background='',b.style.color=''))" class="chart-period btn btn-sm btn-outline" style="background:#22c55e;color:#fff;box-shadow:0 2px 5px rgba(34,197,94,0.3);transition:all 0.2s;">Week</button>
+        <button onclick="this.style.background='#22c55e';this.style.color='#fff';document.querySelectorAll('.chart-period').forEach(b=>b!==this&&(b.style.background='',b.style.color=''))" class="chart-period btn btn-sm btn-outline" style="transition:all 0.2s;">Month</button>
+        <button onclick="this.style.background='#22c55e';this.style.color='#fff';document.querySelectorAll('.chart-period').forEach(b=>b!==this&&(b.style.background='',b.style.color=''))" class="chart-period btn btn-sm btn-outline" style="transition:all 0.2s;">Year</button>
       </div>
     </div>
     <div class="card-body">

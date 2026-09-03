@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: `${import.meta.env.VITE_API_URL || ''}/api`,
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 });
@@ -34,6 +34,15 @@ export const authAPI = {
   me:             ()                                 => api.get('/auth/me'),
   logout:         ()                                 => api.post('/auth/logout'),
   changePassword: (data: Record<string, string>)    => api.post('/auth/change-password', data),
+};
+
+export const verificationAPI = {
+  request: (email: string) => api.post('/verification/request', { email }),
+  confirm: (email: string, code: string) => api.post('/verification/confirm', { email, code }),
+};
+
+export const paymentsAPI = {
+  createIntent: (orderId: string) => api.post('/payments/intent', { orderId }),
 };
 
 // ── CROPS ─────────────────────────────────────────────────────────────────────

@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"  // Change to "postgresql" for production
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -24,6 +24,7 @@ model User {
   bio         String?
   avatar      String?
   verified    Boolean   @default(false)
+  emailVerified Boolean @default(false)
   isActive    Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -40,6 +41,7 @@ model User {
   reviewsReceived   Review[]     @relation("ReviewsReceived")
   notifications     Notification[]
   transportProvider TransportProvider?
+  payments          Payment[]
 
   @@map("users")
 }
@@ -110,8 +112,49 @@ model Order {
 
   // Relations
   transport TransportRequest?
+  payment   Payment?
 
   @@map("orders")
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  orderId     String        @unique
+  order       Order         @relation(fields: [orderId], references: [id])
+  buyerId     Int
+  buyer       User          @relation(fields: [buyerId], references: [id])
+  provider    String        @default("provider-neutral")
+  providerRef String?
+  amount      Float
+  currency    String        @default("INR")
+  status      PaymentStatus @default(PENDING)
+  metadata    String        @default("{}")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([buyerId])
+  @@index([status])
+  @@map("payments")
+}
+
+enum PaymentStatus {
+  PENDING
+  AUTHORIZED
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model EmailVerification {
+  id        String   @id @default(cuid())
+  email     String
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@map("email_verifications")
 }
 
 enum OrderStatus {

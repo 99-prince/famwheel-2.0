@@ -5,9 +5,10 @@ let socket: Socket | null = null;
 
 export function getSocket(): Socket {
   if (!socket) {
-    socket = io(window.location.origin, {
+    socket = io(import.meta.env.VITE_API_URL || window.location.origin, {
       transports: ['websocket', 'polling'],
       autoConnect: false,
+      auth: { token: localStorage.getItem('fw_token') },
     });
   }
   return socket;
@@ -15,9 +16,9 @@ export function getSocket(): Socket {
 
 export function connectSocket(userId: number): void {
   const s = getSocket();
+  s.auth = { token: localStorage.getItem('fw_token') };
   if (!s.connected) {
     s.connect();
-    s.emit('join', userId);
   }
 }
 

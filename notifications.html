@@ -20,9 +20,13 @@
 
       <!-- FILTER TABS -->
       <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
-        ${['All','Offers','Orders','Transport','Reviews','Payments','System'].map((t,i) => `
-          <button onclick="filterNotifs('${t.toLowerCase()}')" class="notif-tab" data-type="${t.toLowerCase()}" style="padding:7px 16px;border-radius:99px;border:1.5px solid ${i===0?'#22c55e':'#e5e7eb'};background:${i===0?'#22c55e':'#fff'};color:${i===0?'#fff':'#6b7280'};font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;">${t}</button>
-        `).join('')}
+        <button onclick="filterNotifs('all')" class="notif-tab" data-type="all" style="padding:7px 16px;border-radius:99px;border:1.5px solid #22c55e;background:#22c55e;color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;box-shadow:0 2px 5px rgba(34,197,94,0.3);">All</button>
+        <button onclick="filterNotifs('offers')" class="notif-tab" data-type="offers" style="padding:7px 16px;border-radius:99px;border:1.5px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;box-shadow:0 2px 5px rgba(0,0,0,0.05);">Offers</button>
+        <button onclick="filterNotifs('orders')" class="notif-tab" data-type="orders" style="padding:7px 16px;border-radius:99px;border:1.5px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;box-shadow:0 2px 5px rgba(0,0,0,0.05);">Orders</button>
+        <button onclick="filterNotifs('transport')" class="notif-tab" data-type="transport" style="padding:7px 16px;border-radius:99px;border:1.5px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;box-shadow:0 2px 5px rgba(0,0,0,0.05);">Transport</button>
+        <button onclick="filterNotifs('reviews')" class="notif-tab" data-type="reviews" style="padding:7px 16px;border-radius:99px;border:1.5px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;box-shadow:0 2px 5px rgba(0,0,0,0.05);">Reviews</button>
+        <button onclick="filterNotifs('payments')" class="notif-tab" data-type="payments" style="padding:7px 16px;border-radius:99px;border:1.5px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;box-shadow:0 2px 5px rgba(0,0,0,0.05);">Payments</button>
+        <button onclick="filterNotifs('system')" class="notif-tab" data-type="system" style="padding:7px 16px;border-radius:99px;border:1.5px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;box-shadow:0 2px 5px rgba(0,0,0,0.05);">System</button>
       </div>
 
       <div class="card">

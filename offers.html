@@ -18,9 +18,10 @@
 
       <!-- TABS -->
       <div style="display:flex;gap:8px;margin-bottom:20px;">
-        ${['All','Pending','Accepted','Rejected'].map((t,i) => `
-          <button onclick="filterOffers('${t.toLowerCase()}')" class="offer-tab" data-type="${t.toLowerCase()}" style="padding:8px 18px;border-radius:99px;border:1.5px solid ${i===0?'#22c55e':'#e5e7eb'};background:${i===0?'#22c55e':'#fff'};color:${i===0?'#fff':'#6b7280'};font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;">${t}</button>
-        `).join('')}
+        <button onclick="filterOffers('all')" class="offer-tab" data-type="all" style="padding:8px 18px;border-radius:99px;border:1.5px solid #22c55e;background:#22c55e;color:#fff;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;box-shadow:0 2px 5px rgba(34,197,94,0.3);">All</button>
+        <button onclick="filterOffers('pending')" class="offer-tab" data-type="pending" style="padding:8px 18px;border-radius:99px;border:1.5px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;box-shadow:0 2px 5px rgba(0,0,0,0.05);">Pending</button>
+        <button onclick="filterOffers('accepted')" class="offer-tab" data-type="accepted" style="padding:8px 18px;border-radius:99px;border:1.5px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;box-shadow:0 2px 5px rgba(0,0,0,0.05);">Accepted</button>
+        <button onclick="filterOffers('rejected')" class="offer-tab" data-type="rejected" style="padding:8px 18px;border-radius:99px;border:1.5px solid #e5e7eb;background:#fff;color:#6b7280;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;box-shadow:0 2px 5px rgba(0,0,0,0.05);">Rejected</button>
       </div>
 
       <div id="offersGrid" style="display:flex;flex-direction:column;gap:16px;"></div>

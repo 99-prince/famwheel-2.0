@@ -31,7 +31,9 @@ router.post('/register', async (req, res) => {
       return res.status(409).json({ success: false, error: 'Email already registered' });
     }
 
-    const validRoles = ['FARMER', 'BUYER', 'TRANSPORT', 'ADMIN'];
+    // Admin accounts must be provisioned by an existing administrator or seed;
+    // allowing a public registration request to choose ADMIN would bypass access control.
+    const validRoles = ['FARMER', 'BUYER', 'TRANSPORT'];
     const userRole   = validRoles.includes(role?.toUpperCase()) ? role.toUpperCase() : 'FARMER';
     const avatarMap  = { FARMER: '👨‍🌾', BUYER: '🛒', TRANSPORT: '🚚', ADMIN: '👨‍💼' };
 

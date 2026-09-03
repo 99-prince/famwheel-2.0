@@ -3,29 +3,67 @@ require('dotenv').config();
 
 const express = require('express');
 const cors    = require('cors');
+const helmet  = require('helmet');
+const rateLimit = require('express-rate-limit');
 const http    = require('http');
 const { Server } = require('socket.io');
+const jwt = require('jsonwebtoken');
 const prisma  = require('./lib/prisma');
+
+if (process.env.NODE_ENV === 'production') {
+  const required = ['DATABASE_URL', 'JWT_SECRET', 'CLIENT_URL', 'PAYMENT_WEBHOOK_SECRET'];
+  const missing = required.filter((name) => !process.env[name] ||
+    process.env[name].includes('replace_with') ||
+    process.env[name].includes('change_in_production'));
+  if (missing.length) {
+    throw new Error(`Missing production environment variables: ${missing.join(', ')}`);
+  }
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASSWORD) {
+    throw new Error('SMTP_HOST, SMTP_USER, and SMTP_PASSWORD are required in production');
+  }
+}
 
 const app    = express();
 const server = http.createServer(app);
+const allowedOrigin = process.env.CLIENT_URL || 'http://localhost:5173';
 
 // ── SOCKET.IO ─────────────────────────────────────────────────────────────
 const io = new Server(server, {
   cors: {
-    origin:  process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: allowedOrigin,
     methods: ['GET', 'POST'],
   },
   transports: ['websocket', 'polling'],
 });
 
+io.use((socket, next) => {
+  const token = socket.handshake.auth?.token;
+  if (!token) return next(new Error('Authentication required'));
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    socket.data.userId = decoded.userId;
+    next();
+  } catch {
+    next(new Error('Invalid authentication token'));
+  }
+});
+
 // ── MIDDLEWARE ────────────────────────────────────────────────────────────
+app.set('trust proxy', 1);
+app.use(helmet());
 app.use(cors({
-  origin:      process.env.CLIENT_URL || 'http://localhost:5173',
+  origin:      allowedOrigin,
   credentials: true,
 }));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: process.env.NODE_ENV === 'production' ? 300 : 1000,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many requests. Please try again later.' },
+}));
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
 // Inject io + prisma into every request so routes can use req.io and req.prisma
 app.use((req, _res, next) => {
@@ -44,6 +82,8 @@ if (process.env.NODE_ENV !== 'production') {
 
 // ── ROUTES ────────────────────────────────────────────────────────────────
 app.use('/api/auth',          require('./routes/auth'));
+app.use('/api/verification',  require('./routes/verification'));
+app.use('/api/payments',      require('./routes/payments'));
 app.use('/api/users',         require('./routes/users'));
 app.use('/api/crops',         require('./routes/crops'));
 app.use('/api/orders',        require('./routes/orders'));
@@ -153,20 +193,25 @@ io.on('connection', (socket) => {
   console.log(`  🔌 Socket connected   : ${socket.id}`);
 
   // User joins their personal room so we can send targeted events
-  socket.on('join', (userId) => {
-    socket.join(`user_${userId}`);
-    console.log(`  ✅ User ${userId} joined room user_${userId}`);
-  });
+  socket.join(`user_${socket.data.userId}`);
+  console.log(`  ✅ User ${socket.data.userId} joined room user_${socket.data.userId}`);
 
   // Relay chat message — also saves to DB for persistence
   socket.on('send_message', async (data) => {
     try {
-      const { fromId, toId, text } = data;
+      const { toId, text } = data;
+      if (!toId || !text?.trim() || text.trim().length > 2000) {
+        return socket.emit('error', { message: 'Invalid message' });
+      }
+      const recipientId = parseInt(toId);
+      if (!Number.isInteger(recipientId)) {
+        return socket.emit('error', { message: 'Invalid recipient' });
+      }
       const message = await prisma.message.create({
-        data: { fromId: parseInt(fromId), toId: parseInt(toId), text },
+        data: { fromId: socket.data.userId, toId: recipientId, text: text.trim() },
         include: { from: { select: { firstName: true, lastName: true, avatar: true } } },
       });
-      io.to(`user_${toId}`).emit('new_message', message);
+      io.to(`user_${recipientId}`).emit('new_message', message);
       socket.emit('message_sent', message);
     } catch (err) {
       console.error('Socket send_message error:', err);
@@ -175,10 +220,10 @@ io.on('connection', (socket) => {
   });
 
   // Mark messages as read
-  socket.on('mark_read', async ({ userId, fromId }) => {
+  socket.on('mark_read', async ({ fromId }) => {
     try {
       await prisma.message.updateMany({
-        where: { toId: parseInt(userId), fromId: parseInt(fromId), isRead: false },
+        where: { toId: socket.data.userId, fromId: parseInt(fromId), isRead: false },
         data:  { isRead: true },
       });
     } catch (err) {

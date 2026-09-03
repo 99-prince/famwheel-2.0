@@ -58,14 +58,14 @@ cd C:\Users\hp\OneDrive\Desktop\Project\FAM_WHEEL_2.0
 This will:
 1. Install all npm packages (server + client)
 2. Generate Prisma client
-3. Create SQLite database
+3. Initialize the configured PostgreSQL database
 4. Seed demo data
 
 ### Step 2 — Start Development Servers
 ```batch
 # Double-click START.bat, OR run in two terminals:
 
-# Terminal 1 — Backend
+# Terminal 1 — Backend (after configuring PostgreSQL and SMTP)
 cd server
 npm run dev        # → http://localhost:5000
 
@@ -168,18 +168,19 @@ npx prisma studio     # Opens at http://localhost:5555
 
 ### Switch to PostgreSQL
 1. Create a PostgreSQL database
-2. Update `server/.env`:
+2. Update `server/.env` with your self-hosted connection string:
    ```
    DATABASE_URL="postgresql://user:password@localhost:5432/famwheel_db"
    ```
-3. Update `server/prisma/schema.prisma`:
-   ```prisma
-   datasource db {
-     provider = "postgresql"   # ← change this
-     url      = env("DATABASE_URL")
-   }
-   ```
-4. Run: `cd server && npx prisma db push`
+3. The schema is already configured for PostgreSQL.
+4. Run: `cd server && npx prisma migrate deploy` (or `npx prisma db push` for first-time setup).
+
+### Payments and email verification
+- `POST /api/payments/intent` creates a provider-neutral payment intent for a buyer order.
+- A real gateway should call `POST /api/payments/webhook` with `x-payment-signature`.
+- Configure `PAYMENT_WEBHOOK_SECRET` before accepting webhooks.
+- `POST /api/verification/request` sends a six-digit email OTP through SMTP.
+- `POST /api/verification/confirm` verifies the OTP; configure SMTP variables in `server/.env`.
 
 ### Deploy
 | Service | What |
@@ -188,6 +189,14 @@ npx prisma studio     # Opens at http://localhost:5555
 | [Railway](https://railway.app) | Deploy `server/` + PostgreSQL |
 | [Render](https://render.com) | Alternative to Railway |
 | [Supabase](https://supabase.com) | Managed PostgreSQL + Auth |
+
+### Production configuration checklist
+1. Set `NODE_ENV=production` and configure every variable in `server/.env.example`.
+2. Set `VITE_API_URL` in `client/.env` to the public HTTPS API URL when the API is hosted separately.
+3. Run `npm run build:client` and serve `client/dist` over HTTPS.
+4. Run `npm run --prefix server db:push` against the production database before starting the server.
+5. Start the API with `npm run start:server`; verify `/api/health`.
+6. Configure HTTPS termination, PostgreSQL backups, log collection, and payment/SMTP webhooks.
 
 ---
 

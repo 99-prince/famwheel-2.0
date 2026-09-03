@@ -53,9 +53,13 @@
         </div>
         <!-- Category Quick Filters -->
         <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
-          ${['All','Grain','Vegetable','Oilseed','Spice','Pulse','Fruit'].map(cat => `
-            <button onclick="quickFilter('${cat}')" class="qf-btn" data-cat="${cat}" style="padding:5px 14px;border-radius:99px;border:1px solid #e5e7eb;background:#fff;font-size:0.78rem;font-weight:600;color:#6b7280;cursor:pointer;transition:all 0.2s;">${cat}</button>
-          `).join('')}
+          <button onclick="quickFilter('All')" class="qf-btn" data-cat="All" style="padding:5px 14px;border-radius:99px;border:1px solid #e5e7eb;background:#fff;font-size:0.78rem;font-weight:600;color:#6b7280;cursor:pointer;transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.05);">All</button>
+          <button onclick="quickFilter('Grain')" class="qf-btn" data-cat="Grain" style="padding:5px 14px;border-radius:99px;border:1px solid #e5e7eb;background:#fff;font-size:0.78rem;font-weight:600;color:#6b7280;cursor:pointer;transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.05);">Grain</button>
+          <button onclick="quickFilter('Vegetable')" class="qf-btn" data-cat="Vegetable" style="padding:5px 14px;border-radius:99px;border:1px solid #e5e7eb;background:#fff;font-size:0.78rem;font-weight:600;color:#6b7280;cursor:pointer;transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.05);">Vegetable</button>
+          <button onclick="quickFilter('Oilseed')" class="qf-btn" data-cat="Oilseed" style="padding:5px 14px;border-radius:99px;border:1px solid #e5e7eb;background:#fff;font-size:0.78rem;font-weight:600;color:#6b7280;cursor:pointer;transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.05);">Oilseed</button>
+          <button onclick="quickFilter('Spice')" class="qf-btn" data-cat="Spice" style="padding:5px 14px;border-radius:99px;border:1px solid #e5e7eb;background:#fff;font-size:0.78rem;font-weight:600;color:#6b7280;cursor:pointer;transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.05);">Spice</button>
+          <button onclick="quickFilter('Pulse')" class="qf-btn" data-cat="Pulse" style="padding:5px 14px;border-radius:99px;border:1px solid #e5e7eb;background:#fff;font-size:0.78rem;font-weight:600;color:#6b7280;cursor:pointer;transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.05);">Pulse</button>
+          <button onclick="quickFilter('Fruit')" class="qf-btn" data-cat="Fruit" style="padding:5px 14px;border-radius:99px;border:1px solid #e5e7eb;background:#fff;font-size:0.78rem;font-weight:600;color:#6b7280;cursor:pointer;transition:all 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.05);">Fruit</button>
         </div>
       </div>
 
