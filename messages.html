@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Messages – FAM WHEEL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="dashboard.css"/>
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebarContainer"></div>
+  <div class="main-content">
+    <div id="headerContainer"></div>
+    <div style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
+      <div class="chat-layout" style="flex:1;">
+
+        <!-- CONTACT LIST -->
+        <div class="chat-sidebar">
+          <div class="chat-sidebar-header" style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <h3>💬 Messages</h3>
+              <button class="btn btn-sm btn-primary" onclick="newConversation()"><i class="fas fa-pen"></i> New</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:8px 12px;">
+              <i class="fas fa-search" style="color:#9ca3af;font-size:0.82rem;"></i>
+              <input type="text" placeholder="Search messages…" id="msgSearch" oninput="filterContacts()" style="border:none;background:none;outline:none;font-size:0.83rem;font-family:Inter,sans-serif;width:100%;"/>
+            </div>
+          </div>
+          <div id="contactList"></div>
+        </div>
+
+        <!-- CHAT MAIN -->
+        <div class="chat-main" id="chatMain">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#9ca3af;gap:12px;">
+            <span style="font-size:3rem;">💬</span>
+            <p style="font-size:1rem;font-weight:600;">Select a conversation</p>
+            <p style="font-size:0.85rem;">Choose a contact from the left to start chatting</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script src="data.js"></script>
+<script src="shared-ui.js"></script>
+<script>
+const user = Auth.requireAuth();
+renderSidebar('messages');
+renderDashHeader('💬 Messages', 'Chat with farmers, buyers & transport providers');
+
+const messages = FamData.getMessages(user.id);
+let activeContact = null;
+
+// Build unique contacts
+const contactMap = {};
+messages.forEach(m => {
+  const otherId   = m.fromId === user.id ? m.toId   : m.fromId;
+  const otherName = m.fromId === user.id ? m.toName : m.fromName;
+  const otherAvatar = m.fromId === user.id ? (m.toAvatar||'👤') : m.fromAvatar;
+  if (!contactMap[otherId]) contactMap[otherId] = { id:otherId, name:otherName, avatar:otherAvatar, messages:[] };
+  contactMap[otherId].messages.push(m);
+});
+const contacts = Object.values(contactMap);
+
+function filterContacts() {
+  const q = document.getElementById('msgSearch').value.toLowerCase();
+  renderContacts(contacts.filter(c => c.name.toLowerCase().includes(q)));
+}
+
+function renderContacts(list) {
+  document.getElementById('contactList').innerHTML = list.map(c => {
+    const last = c.messages[c.messages.length - 1];
+    const unread = c.messages.filter(m => !m.read && m.toId === user.id).length;
+    const isActive = activeContact && activeContact.id === c.id;
+    return `
+      <div class="chat-contact ${isActive ? 'active' : ''}" onclick="openChat(${c.id})">
+        <div class="contact-avatar">
+          <span style="font-size:1.4rem;">${c.avatar}</span>
+          <div class="contact-online"></div>
+        </div>
+        <div class="contact-info">
+          <div class="contact-name">${c.name}</div>
+          <div class="contact-last-msg">${last ? last.text : ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <span class="contact-time">${last ? last.time.split(' ')[1] : ''}</span>
+          ${unread > 0 ? `<div class="unread-dot"></div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('') || '<div style="padding:20px;text-align:center;color:#9ca3af;font-size:0.85rem;">No conversations found</div>';
+}
+
+function openChat(contactId) {
+  activeContact = contacts.find(c => c.id === contactId);
+  if (!activeContact) return;
+
+  // Mark as active
+  renderContacts(contacts);
+
+  const chatMain = document.getElementById('chatMain');
+  chatMain.innerHTML = `
+    <div class="chat-main-header">
+      <div class="contact-avatar" style="width:44px;height:44px;">
+        <span style="font-size:1.5rem;">${activeContact.avatar}</span>
+        <div class="contact-online"></div>
+      </div>
+      <div>
+        <div style="font-size:0.97rem;font-weight:700;color:#111;">${activeContact.name}</div>
+        <div style="font-size:0.75rem;color:#22c55e;font-weight:500;"><i class="fas fa-circle" style="font-size:0.5rem;"></i> Online</div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;">
+        <button class="btn btn-sm btn-outline" onclick="showToast('Voice call coming soon!','info')"><i class="fas fa-phone"></i></button>
+        <button class="btn btn-sm btn-outline" onclick="showToast('Video call coming soon!','info')"><i class="fas fa-video"></i></button>
+        <button class="btn btn-sm btn-outline" onclick="window.location.href='marketplace.html'"><i class="fas fa-store"></i> View Listings</button>
+      </div>
+    </div>
+
+    <div class="chat-messages" id="chatMessages"></div>
+
+    <div class="chat-input-bar">
+      <button style="background:none;border:none;font-size:1.2rem;cursor:pointer;" onclick="showToast('Attachment feature coming soon!','info')">📎</button>
+      <input type="text" id="chatInput" placeholder="Type a message…" onkeydown="if(event.key==='Enter')sendMessage()"/>
+      <button class="btn btn-sm btn-outline" onclick="showToast('Emoji picker coming soon!','info')">😊</button>
+      <button class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  `;
+
+  renderMessages();
+  document.getElementById('chatInput')?.focus();
+}
+
+function renderMessages() {
+  const container = document.getElementById('chatMessages');
+  if (!container || !activeContact) return;
+
+  // Date separator + messages
+  const msgs = activeContact.messages;
+  let html = `<div style="text-align:center;margin:8px 0;"><span style="background:#e5e7eb;color:#6b7280;font-size:0.72rem;padding:4px 12px;border-radius:99px;">Today</span></div>`;
+
+  msgs.forEach(m => {
+    const isOwn = m.fromId === user.id;
+    html += `
+      <div class="msg-bubble-wrap ${isOwn ? 'own' : ''}">
+        <div class="msg-avatar">${isOwn ? (user.avatar || user.firstName[0]) : activeContact.avatar}</div>
+        <div>
+          <div class="msg-bubble">${m.text}</div>
+          <div class="msg-time">${m.time.split(' ')[1]} ${isOwn ? '✓✓' : ''}</div>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+  container.scrollTop = container.scrollHeight;
+}
+
+function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input?.value.trim();
+  if (!text || !activeContact) return;
+
+  // Add to contact messages
+  const newMsg = {
+    id: Date.now(),
+    fromId: user.id, fromName: user.firstName + ' ' + user.lastName, fromAvatar: user.avatar,
+    toId: activeContact.id, toName: activeContact.name,
+    text, time: new Date().toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' }), read: true
+  };
+  activeContact.messages.push(newMsg);
+  input.value = '';
+  renderMessages();
+
+  // Simulate reply
+  setTimeout(() => {
+    const replies = [
+      'Thank you for your message! I will get back to you shortly.',
+      'Sure, I can arrange that. Let me check my stock first.',
+      'The price is negotiable. How much quantity do you need?',
+      'I can deliver within 3 days. Shall we confirm the order?',
+      'Please check my other listings too. I have fresh produce available.',
+    ];
+    const reply = { id: Date.now()+1, fromId: activeContact.id, fromName: activeContact.name, fromAvatar: activeContact.avatar, toId: user.id, toName: user.firstName, text: replies[Math.floor(Math.random()*replies.length)], time: new Date().toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' }), read: false };
+    activeContact.messages.push(reply);
+    renderMessages();
+    renderContacts(contacts);
+  }, 1500 + Math.random()*2000);
+}
+
+function newConversation() {
+  showToast('Search for a farmer in the Marketplace and click Message!', 'info');
+}
+
+renderContacts(contacts);
+if (contacts.length > 0) openChat(contacts[0].id);
+</script>
+</body>
+</html>

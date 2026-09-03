@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Profile – FAM WHEEL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="dashboard.css"/>
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebarContainer"></div>
+  <div class="main-content">
+    <div id="headerContainer"></div>
+    <div class="page-content" id="profileContent"></div>
+  </div>
+</div>
+<script src="auth.js"></script>
+<script src="data.js"></script>
+<script src="shared-ui.js"></script>
+<script>
+const user = Auth.requireAuth();
+renderSidebar('profile');
+renderDashHeader('👤 My Profile', 'Manage your account settings');
+
+const reviews = FamData.getReviews(user.id);
+const avgRating = reviews.length ? (reviews.reduce((s,r)=>s+r.rating,0)/reviews.length).toFixed(1) : '—';
+
+document.getElementById('profileContent').innerHTML = `
+  <!-- PROFILE HEADER BANNER -->
+  <div class="profile-header">
+    <div class="profile-avatar-big">${user.avatar || user.firstName[0]}</div>
+    <div class="profile-meta">
+      <div class="role-badge"><i class="fas fa-${user.role==='farmer'?'tractor':user.role==='buyer'?'shopping-cart':user.role==='transport'?'truck':'user-shield'}"></i> ${capitalize(user.role)}</div>
+      <h2>${user.firstName} ${user.lastName}</h2>
+      <div class="contact-info">
+        <span><i class="fas fa-envelope"></i> ${user.email}</span>
+        <span><i class="fas fa-phone"></i> ${user.phone || 'Not added'}</span>
+        <span><i class="fas fa-map-marker-alt"></i> ${user.state || 'Not set'}</span>
+        <span><i class="fas fa-calendar"></i> Joined ${user.joinedDate}</span>
+      </div>
+    </div>
+    <div style="margin-left:auto;display:flex;flex-direction:column;gap:12px;align-items:flex-end;position:relative;z-index:1;">
+      <div style="background:rgba(255,255,255,0.1);border-radius:14px;padding:16px 24px;text-align:center;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);">
+        <div style="font-size:2rem;font-weight:800;color:#4ade80;">★ ${avgRating}</div>
+        <div style="font-size:0.78rem;color:rgba(255,255,255,0.55);">${reviews.length} reviews</div>
+      </div>
+      ${user.verified ? `<span style="background:rgba(34,197,94,0.2);border:1px solid rgba(34,197,94,0.3);color:#4ade80;padding:6px 14px;border-radius:99px;font-size:0.8rem;font-weight:700;">✅ Verified Account</span>` : `<span style="background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.3);color:#f87171;padding:6px 14px;border-radius:99px;font-size:0.8rem;font-weight:700;">⚠️ Pending Verification</span>`}
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row" style="margin-bottom:22px;">
+    <div class="stat-card"><div class="stat-card-info"><h4>Total Revenue</h4><div class="value">${FamData.formatMoney(user.totalSales||user.totalPurchases||user.totalEarnings||0)}</div><div class="change pos"><i class="fas fa-arrow-up"></i> All time</div></div><div class="stat-icon" style="background:#dcfce7;color:#22c55e;font-size:1.2rem;">₹</div></div>
+    <div class="stat-card"><div class="stat-card-info"><h4>Total Orders</h4><div class="value">${user.totalOrders||0}</div><div class="change pos"><i class="fas fa-shopping-bag"></i> Completed</div></div><div class="stat-icon" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-shopping-bag"></i></div></div>
+    <div class="stat-card"><div class="stat-card-info"><h4>Rating</h4><div class="value">${avgRating} ★</div><div class="change pos"><i class="fas fa-star"></i> From ${reviews.length} reviews</div></div><div class="stat-icon" style="background:#fef9c3;color:#d97706;"><i class="fas fa-star"></i></div></div>
+    <div class="stat-card"><div class="stat-card-info"><h4>Member Since</h4><div class="value" style="font-size:1.1rem;">${user.joinedDate}</div><div class="change pos"><i class="fas fa-calendar"></i> Active member</div></div><div class="stat-icon" style="background:#f3e8ff;color:#9333ea;"><i class="fas fa-medal"></i></div></div>
+  </div>
+
+  <div class="grid-2">
+    <!-- EDIT PROFILE FORM -->
+    <div class="card">
+      <div class="card-header"><h3>✏️ Edit Profile</h3></div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-col"><label class="form-label">First Name</label><input class="form-input" id="pf-fname" value="${user.firstName}"/></div>
+          <div class="form-col"><label class="form-label">Last Name</label><input class="form-input" id="pf-lname" value="${user.lastName}"/></div>
+        </div>
+        <div style="margin-bottom:14px;"><label class="form-label">Email</label><input class="form-input" id="pf-email" value="${user.email}" type="email"/></div>
+        <div style="margin-bottom:14px;"><label class="form-label">Phone Number</label><input class="form-input" id="pf-phone" value="${user.phone||''}" placeholder="+91 98765 43210"/></div>
+        <div class="form-row">
+          <div class="form-col">
+            <label class="form-label">State</label>
+            <select class="form-input" id="pf-state">
+              ${['','Punjab','Maharashtra','UP','MP','Rajasthan','Gujarat','Karnataka','West Bengal','Kerala','Delhi','Other'].map(s=>`<option ${user.state===s?'selected':''}>${s}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-col"><label class="form-label">City</label><input class="form-input" id="pf-city" value="${user.city||''}"/></div>
+        </div>
+        <div style="margin-bottom:20px;"><label class="form-label">Bio / Description</label><textarea class="form-input form-textarea" id="pf-bio" placeholder="Tell buyers/farmers about yourself, your farm, or business…">${user.bio||''}</textarea></div>
+        <button class="btn btn-primary" style="width:100%;" onclick="saveProfile()"><i class="fas fa-save"></i> Save Changes</button>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:20px;">
+      <!-- REVIEWS -->
+      <div class="card">
+        <div class="card-header"><h3>⭐ Reviews (${reviews.length})</h3></div>
+        <div class="card-body" style="padding:0;">
+          ${reviews.map(r => `
+            <div style="padding:16px 20px;border-bottom:1px solid #f3f4f6;">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                <div style="width:36px;height:36px;border-radius:50%;background:#f0fdf4;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">${r.fromAvatar}</div>
+                <div>
+                  <div style="font-size:0.88rem;font-weight:700;color:#111;">${r.fromName}</div>
+                  <div style="font-size:0.7rem;color:#9ca3af;">${r.date} · ${r.crop}</div>
+                </div>
+                <div style="margin-left:auto;color:#d97706;font-size:0.88rem;">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+              </div>
+              <p style="font-size:0.84rem;color:#6b7280;line-height:1.6;font-style:italic;">"${r.text}"</p>
+            </div>
+          `).join('') || '<div class="empty-state" style="padding:30px;"><div class="empty-icon">⭐</div><p>No reviews yet</p></div>'}
+        </div>
+      </div>
+
+      <!-- SECURITY -->
+      <div class="card">
+        <div class="card-header"><h3>🔒 Security</h3></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:#f9fafb;border-radius:12px;">
+            <div><div style="font-size:0.87rem;font-weight:600;color:#111;">Password</div><div style="font-size:0.77rem;color:#9ca3af;">Last changed: Never</div></div>
+            <button class="btn btn-sm btn-outline" onclick="showToast('Password change coming soon!','info')">Change</button>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:#f9fafb;border-radius:12px;">
+            <div><div style="font-size:0.87rem;font-weight:600;color:#111;">Two-Factor Auth</div><div style="font-size:0.77rem;color:#9ca3af;">Adds extra security to your account</div></div>
+            <button class="btn btn-sm btn-outline" onclick="showToast('2FA setup coming soon!','info')">Enable</button>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:#f9fafb;border-radius:12px;">
+            <div><div style="font-size:0.87rem;font-weight:600;color:#111;">Verification Status</div><div style="font-size:0.77rem;color:#9ca3af;">${user.verified ? 'Account verified ✅' : 'Submit documents to verify'}</div></div>
+            ${user.verified ? '<span class="badge badge-green">Verified</span>' : '<button class="btn btn-sm btn-primary" onclick="showToast(\'Verification request sent!\',\'success\')">Verify Now</button>'}
+          </div>
+          <button class="btn btn-danger" style="width:100%;margin-top:4px;" onclick="Auth.logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+`;
+
+function saveProfile() {
+  const updated = {
+    ...user,
+    firstName: document.getElementById('pf-fname').value,
+    lastName:  document.getElementById('pf-lname').value,
+    email:     document.getElementById('pf-email').value,
+    phone:     document.getElementById('pf-phone').value,
+    state:     document.getElementById('pf-state').value,
+    city:      document.getElementById('pf-city').value,
+    bio:       document.getElementById('pf-bio').value,
+  };
+  localStorage.setItem('famwheel_user', JSON.stringify(updated));
+  showToast('Profile updated successfully!', 'success');
+}
+</script>
+</body>
+</html>

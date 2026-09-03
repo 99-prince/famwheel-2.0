@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Offers – FAM WHEEL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="dashboard.css"/>
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebarContainer"></div>
+  <div class="main-content">
+    <div id="headerContainer"></div>
+    <div class="page-content">
+      <h1 class="page-title">🤝 Offers</h1>
+      <p class="page-subtitle">Review buyer offers on your listings and negotiate prices</p>
+
+      <!-- TABS -->
+      <div style="display:flex;gap:8px;margin-bottom:20px;">
+        ${['All','Pending','Accepted','Rejected'].map((t,i) => `
+          <button onclick="filterOffers('${t.toLowerCase()}')" class="offer-tab" data-type="${t.toLowerCase()}" style="padding:8px 18px;border-radius:99px;border:1.5px solid ${i===0?'#22c55e':'#e5e7eb'};background:${i===0?'#22c55e':'#fff'};color:${i===0?'#fff':'#6b7280'};font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;">${t}</button>
+        `).join('')}
+      </div>
+
+      <div id="offersGrid" style="display:flex;flex-direction:column;gap:16px;"></div>
+    </div>
+  </div>
+</div>
+<script src="auth.js"></script>
+<script src="data.js"></script>
+<script src="shared-ui.js"></script>
+<script>
+const user = Auth.requireAuth();
+renderSidebar('offers');
+renderDashHeader('🤝 Offers', 'Negotiate and manage price offers');
+
+const offers = FamData.getOffers(user.id);
+
+function filterOffers(type) {
+  document.querySelectorAll('.offer-tab').forEach(btn => {
+    const active = btn.dataset.type === type;
+    btn.style.background = active ? '#22c55e' : '#fff';
+    btn.style.color = active ? '#fff' : '#6b7280';
+    btn.style.borderColor = active ? '#22c55e' : '#e5e7eb';
+  });
+  const filtered = type === 'all' ? offers : offers.filter(o => o.status === type);
+  renderOffers(filtered);
+}
+
+function renderOffers(list) {
+  const statusColors = { pending:'#fef9c3,#d97706', accepted:'#dcfce7,#16a34a', rejected:'#fee2e2,#dc2626' };
+  document.getElementById('offersGrid').innerHTML = list.map(o => {
+    const [bg, clr] = (statusColors[o.status] || '#f3f4f6,#6b7280').split(',');
+    const incoming = o.toId === user.id;
+    return `
+      <div style="background:#fff;border-radius:16px;border:1px solid #e5e7eb;padding:22px 24px;transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 20px rgba(0,0,0,0.07)'" onmouseout="this.style.boxShadow=''">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="width:52px;height:52px;background:${bg};border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;">${o.cropEmoji}</div>
+            <div>
+              <div style="font-size:1rem;font-weight:800;color:#111;">${o.cropName}</div>
+              <div style="font-size:0.8rem;color:#6b7280;margin-top:2px;">${incoming ? `From: <strong style="color:#111;">${o.fromName}</strong>` : `To: <strong style="color:#111;">${o.toName}</strong>`} · ${o.date}</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            ${FamData.statusBadge(o.status)}
+            <span style="background:${incoming?'#f0fdf4':'#dbeafe'};color:${incoming?'#16a34a':'#2563eb'};padding:4px 12px;border-radius:99px;font-size:0.75rem;font-weight:700;">${incoming?'📩 Incoming':'📤 Outgoing'}</span>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0;padding:16px;background:#f9fafb;border-radius:12px;">
+          <div style="text-align:center;">
+            <div style="font-size:0.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Offered Price</div>
+            <div style="font-size:1.1rem;font-weight:800;color:#16a34a;">${FamData.formatMoney(o.offerPrice)}<span style="font-size:0.72rem;color:#9ca3af;font-weight:400;">/${o.unit}</span></div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:0.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Quantity</div>
+            <div style="font-size:1.1rem;font-weight:800;color:#111;">${o.qty} ${o.unit}</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:0.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Total Value</div>
+            <div style="font-size:1.1rem;font-weight:800;color:#111;">${FamData.formatMoney(o.totalAmount)}</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:0.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Offer ID</div>
+            <div style="font-size:0.88rem;font-weight:700;color:#6b7280;">${o.id}</div>
+          </div>
+        </div>
+
+        ${o.message ? `<div style="background:#fef9c3;border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:0.85rem;color:#374151;font-style:italic;"><i class="fas fa-quote-left" style="color:#d97706;margin-right:6px;"></i>${o.message}</div>` : ''}
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          ${incoming && o.status === 'pending' ? `
+            <button class="btn btn-primary" onclick="respondOffer('${o.id}','accept')"><i class="fas fa-check"></i> Accept Offer</button>
+            <button style="background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;padding:10px 18px;font-size:0.87rem;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px;" onmouseover="this.style.borderColor='#22c55e';this.style.color='#16a34a'" onmouseout="this.style.borderColor='#e5e7eb';this.style.color=''" onclick="counterOffer('${o.id}')"><i class="fas fa-comment-dollar"></i> Counter Offer</button>
+            <button class="btn btn-danger" onclick="respondOffer('${o.id}','reject')"><i class="fas fa-times"></i> Reject</button>
+          ` : ''}
+          <button class="btn btn-outline" onclick="window.location.href='messages.html'"><i class="fas fa-comments"></i> Message</button>
+        </div>
+      </div>
+    `;
+  }).join('') || `<div class="empty-state card" style="padding:60px;"><div class="empty-icon">🤝</div><h3>No offers yet</h3><p>Offers from buyers will appear here. List your crops to start receiving offers!</p><a href="marketplace.html" class="btn btn-primary" style="display:inline-flex;align-items:center;gap:8px;"><i class="fas fa-store"></i> Browse Market</a></div>`;
+}
+
+function respondOffer(id, action) {
+  showModal({
+    title: action === 'accept' ? 'Accept Offer' : 'Reject Offer',
+    body: action === 'accept' ? 'Accept this offer? The buyer will be notified and an order will be created.' : 'Reject this offer? The buyer will be notified.',
+    confirmText: action === 'accept' ? '✅ Accept' : '❌ Reject',
+    danger: action === 'reject',
+    onConfirm: () => {
+      showToast(action === 'accept' ? 'Offer accepted! Order created successfully.' : 'Offer rejected. Buyer notified.', action === 'accept' ? 'success' : 'info');
+      setTimeout(() => { if(action === 'accept') window.location.href = 'orders.html'; }, 1500);
+    }
+  });
+}
+
+function counterOffer(id) {
+  const newPrice = prompt('Enter your counter price (₹ per unit):');
+  if (newPrice && !isNaN(newPrice)) {
+    showToast(`Counter offer of ₹${parseInt(newPrice).toLocaleString('en-IN')} sent to buyer!`, 'success');
+  }
+}
+
+filterOffers('all');
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{
+  "name": "famwheel-server",
+  "version": "1.0.0",
+  "description": "FAM WHEEL Backend API – Node.js + Express + Prisma",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "db:push": "npx prisma db push",
+    "db:seed": "node src/prisma/seed.js",
+    "db:studio": "npx prisma studio",
+    "setup": "npm install && npx prisma generate && npx prisma db push && node src/prisma/seed.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.7.0",
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.41.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "socket.io": "^4.6.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "prisma": "^5.7.0"
+  }
+}

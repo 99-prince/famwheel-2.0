@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Dashboard – FAM WHEEL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="dashboard.css"/>
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebarContainer"></div>
+  <div class="main-content">
+    <div id="headerContainer"></div>
+    <div class="page-content" id="pageContent">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script src="data.js"></script>
+<script src="shared-ui.js"></script>
+<script>
+const user = Auth.requireAuth();
+if (!user) throw new Error('not logged in');
+
+renderSidebar('dashboard');
+renderDashHeader();
+
+const content = document.getElementById('pageContent');
+
+// ── STATS
+const orders = FamData.getOrders(user.id, user.role);
+const notifs  = FamData.getNotifications(user.id);
+const unreadMsgs = FamData.getMessages(user.id).filter(m => !m.read && m.toId === user.id).length;
+const unreadNotifs = notifs.filter(n => !n.read).length;
+
+const revenue = user.role === 'farmer' ? '₹1,24,500' : user.role === 'transport' ? '₹64,000' : '₹85,000';
+const revenueLabel = user.role === 'transport' ? 'Total Earnings' : user.role === 'buyer' ? 'Total Spent' : 'Total Revenue';
+const listingsCount = user.role === 'farmer' ? 12 : '-';
+
+// Market prices for mini ticker
+const prices = FamData.getMarketPrices();
+
+content.innerHTML = `
+<!-- WELCOME BANNER -->
+<div style="background:linear-gradient(135deg,#0a0f0d,#1a3020);border-radius:20px;padding:28px 32px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden;">
+  <div style="position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(34,197,94,0.18) 0%,transparent 70%);pointer-events:none;"></div>
+  <div style="position:relative;z-index:1;">
+    <div style="font-size:0.82rem;color:rgba(255,255,255,0.5);font-weight:500;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.06em;">Welcome back</div>
+    <h2 style="font-size:1.7rem;font-weight:800;color:#fff;margin-bottom:6px;">${user.firstName} ${user.lastName} ${user.avatar}</h2>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span style="background:rgba(34,197,94,0.2);border:1px solid rgba(34,197,94,0.3);color:#4ade80;font-size:0.78rem;font-weight:700;padding:3px 12px;border-radius:99px;">${capitalize(user.role)}</span>
+      ${user.verified ? '<span style="background:rgba(59,130,246,0.2);border:1px solid rgba(59,130,246,0.3);color:#60a5fa;font-size:0.78rem;font-weight:700;padding:3px 12px;border-radius:99px;">✅ Verified</span>' : '<span style="background:rgba(239,68,68,0.2);color:#f87171;font-size:0.78rem;font-weight:600;padding:3px 12px;border-radius:99px;">⚠️ Pending Verification</span>'}
+      <span style="color:rgba(255,255,255,0.4);font-size:0.78rem;"><i class="fas fa-map-marker-alt"></i> ${user.state || 'India'}</span>
+    </div>
+  </div>
+  <div style="display:flex;gap:12px;position:relative;z-index:1;">
+    <a href="my-listings.html" style="display:flex;align-items:center;gap:8px;padding:12px 22px;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);color:#4ade80;font-size:0.87rem;font-weight:700;border-radius:12px;transition:all 0.2s;" onmouseover="this.style.background='rgba(34,197,94,0.25)'" onmouseout="this.style.background='rgba(34,197,94,0.15)'">
+      <i class="fas fa-plus"></i> Add Listing
+    </a>
+    <a href="marketplace.html" style="display:flex;align-items:center;gap:8px;padding:12px 22px;background:#22c55e;color:#fff;font-size:0.87rem;font-weight:700;border-radius:12px;transition:all 0.2s;" onmouseover="this.style.background='#16a34a'" onmouseout="this.style.background='#22c55e'">
+      <i class="fas fa-store"></i> Browse Market
+    </a>
+  </div>
+</div>
+
+<!-- STATS ROW -->
+<div class="stats-row">
+  <div class="stat-card" onclick="window.location.href='orders.html'" style="cursor:pointer;">
+    <div class="stat-card-info">
+      <h4>${revenueLabel}</h4>
+      <div class="value">${revenue}</div>
+      <div class="change pos"><i class="fas fa-arrow-up"></i> +18.4% this month</div>
+    </div>
+    <div class="stat-icon" style="background:#dcfce7;color:#22c55e;font-size:1.5rem;">₹</div>
+  </div>
+  <div class="stat-card" onclick="window.location.href='orders.html'" style="cursor:pointer;">
+    <div class="stat-card-info">
+      <h4>Total Orders</h4>
+      <div class="value">${orders.length || 5}</div>
+      <div class="change pos"><i class="fas fa-arrow-up"></i> +3 new this week</div>
+    </div>
+    <div class="stat-icon" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-shopping-bag"></i></div>
+  </div>
+  <div class="stat-card" onclick="window.location.href='messages.html'" style="cursor:pointer;">
+    <div class="stat-card-info">
+      <h4>New Messages</h4>
+      <div class="value">${unreadMsgs || 2}</div>
+      <div class="change ${unreadMsgs > 0 ? 'neg' : 'pos'}"><i class="fas fa-${unreadMsgs > 0 ? 'exclamation' : 'check'}"></i> ${unreadMsgs > 0 ? unreadMsgs + ' unread' : 'All read'}</div>
+    </div>
+    <div class="stat-icon" style="background:#f3e8ff;color:#9333ea;"><i class="fas fa-comments"></i></div>
+  </div>
+  <div class="stat-card" onclick="window.location.href='notifications.html'" style="cursor:pointer;">
+    <div class="stat-card-info">
+      <h4>Notifications</h4>
+      <div class="value">${unreadNotifs}</div>
+      <div class="change ${unreadNotifs > 0 ? 'neg' : 'pos'}"><i class="fas fa-bell"></i> ${unreadNotifs} unread</div>
+    </div>
+    <div class="stat-icon" style="background:#fef9c3;color:#d97706;"><i class="fas fa-bell"></i></div>
+  </div>
+</div>
+
+<!-- CHART + ACTIVITY -->
+<div class="grid-2-1" style="margin-bottom:24px;">
+  <!-- Revenue Chart -->
+  <div class="card">
+    <div class="card-header">
+      <h3>📈 Revenue This Week</h3>
+      <div style="display:flex;gap:6px;">
+        <button onclick="this.style.background='#22c55e';this.style.color='#fff';document.querySelectorAll(\".chart-period\").forEach(b=>b!==this&&(b.style.background=\"\",b.style.color=\"\"))" class="chart-period btn btn-sm btn-outline" style="background:#22c55e;color:#fff;">Week</button>
+        <button onclick="this.style.background='#22c55e';this.style.color='#fff';document.querySelectorAll(\".chart-period\").forEach(b=>b!==this&&(b.style.background=\"\",b.style.color=\"\"))" class="chart-period btn btn-sm btn-outline">Month</button>
+        <button onclick="this.style.background='#22c55e';this.style.color='#fff';document.querySelectorAll(\".chart-period\").forEach(b=>b!==this&&(b.style.background=\"\",b.style.color=\"\"))" class="chart-period btn btn-sm btn-outline">Year</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div>
+          <div style="font-size:1.8rem;font-weight:800;color:#111;">₹34,200</div>
+          <div style="font-size:0.8rem;color:#22c55e;font-weight:600;"><i class="fas fa-arrow-up"></i> 12.5% vs last week</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:0.75rem;color:#9ca3af;">Avg / day</div>
+          <div style="font-size:1.1rem;font-weight:700;color:#374151;">₹4,885</div>
+        </div>
+      </div>
+      <!-- Chart -->
+      <div style="display:flex;align-items:flex-end;gap:10px;height:160px;" id="chartBars">
+        ${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map((d,i) => {
+          const vals=[40,65,50,80,60,92,30];
+          const color = i===5 ? 'linear-gradient(180deg,#fbbf24,#d97706)' : 'linear-gradient(180deg,#4ade80,#16a34a)';
+          return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;">
+            <div style="font-size:0.68rem;color:#9ca3af;font-weight:600;">₹${(vals[i]*350).toLocaleString('en-IN')}</div>
+            <div class="chart-bar-anim" style="width:100%;border-radius:8px 8px 0 0;background:${color};height:0%;transition:height 1s cubic-bezier(0.4,0,0.2,1);" data-h="${vals[i]}"></div>
+            <div style="font-size:0.72rem;color:#9ca3af;font-weight:500;">${d}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions & Market -->
+  <div style="display:flex;flex-direction:column;gap:18px;">
+    <div class="card">
+      <div class="card-header"><h3>⚡ Quick Actions</h3></div>
+      <div class="card-body" style="padding:14px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          ${[
+            {href:'my-listings.html',icon:'fas fa-plus-circle',label:'Add Listing',color:'#22c55e',bg:'#dcfce7'},
+            {href:'transport.html',icon:'fas fa-truck',label:'Transport',color:'#2563eb',bg:'#dbeafe'},
+            {href:'messages.html',icon:'fas fa-comments',label:'Messages',color:'#9333ea',bg:'#f3e8ff'},
+            {href:'market-prices.html',icon:'fas fa-chart-line',label:'Market Prices',color:'#d97706',bg:'#fef9c3'},
+            {href:'offers.html',icon:'fas fa-handshake',label:'Offers',color:'#0d9488',bg:'#ccfbf1'},
+            {href:'orders.html',icon:'fas fa-shopping-bag',label:'Orders',color:'#dc2626',bg:'#fee2e2'},
+          ].map(a => `
+            <a href="${a.href}" style="display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px 8px;border-radius:12px;background:${a.bg};transition:all 0.2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+              <i class="${a.icon}" style="font-size:1.3rem;color:${a.color};"></i>
+              <span style="font-size:0.75rem;font-weight:600;color:${a.color};">${a.label}</span>
+            </a>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>📍 Your Location</h3><a href="profile.html" style="font-size:0.78rem;color:#22c55e;font-weight:600;">Edit</a></div>
+      <div class="card-body" style="background:linear-gradient(135deg,#dcfce7,#bbf7d0);border-radius:12px;text-align:center;padding:20px;">
+        <div style="font-size:2.5rem;margin-bottom:8px;">📍</div>
+        <div style="font-weight:700;color:#111;">${user.state || 'Not Set'}</div>
+        <div style="font-size:0.78rem;color:#6b7280;margin-top:4px;">Buyers and transport nearby can find you</div>
+        <a href="marketplace.html" style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;background:#22c55e;color:#fff;padding:8px 18px;border-radius:99px;font-size:0.82rem;font-weight:700;">
+          <i class="fas fa-search"></i> Nearby Crops
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RECENT ORDERS + NOTIFICATIONS -->
+<div class="grid-2">
+  <div class="card">
+    <div class="card-header">
+      <h3>📦 Recent Orders</h3>
+      <a href="orders.html" style="font-size:0.8rem;color:#22c55e;font-weight:600;">View all →</a>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Crop</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+          ${FamData.getOrders().slice(0,5).map(o => `
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:1.2rem;">${o.cropEmoji}</span><div><strong>${o.cropName}</strong><div style="font-size:0.74rem;color:#9ca3af;">${o.qty} ${o.unit}</div></div></div></td>
+              <td><strong>${FamData.formatMoney(o.totalAmount)}</strong></td>
+              <td>${FamData.statusBadge(o.status)}</td>
+              <td><a href="orders.html" class="btn btn-sm btn-outline">View</a></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Notifications -->
+  <div class="card">
+    <div class="card-header">
+      <h3>🔔 Notifications</h3>
+      <a href="notifications.html" style="font-size:0.8rem;color:#22c55e;font-weight:600;">View all →</a>
+    </div>
+    <div class="card-body" style="padding:0;">
+      ${FamData.getNotifications().slice(0,6).map(n => `
+        <a href="${n.link}" style="display:flex;align-items:flex-start;gap:12px;padding:14px 20px;border-bottom:1px solid #f3f4f6;transition:background 0.2s;${!n.read ? 'background:#fafffe;' : ''}" onmouseover="this.style.background='#f0fdf4'" onmouseout="this.style.background='${!n.read ? '#fafffe' : '#fff'}'">
+          <span style="font-size:1.3rem;flex-shrink:0;">${n.icon}</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:0.85rem;font-weight:${n.read ? '500' : '700'};color:#111;margin-bottom:2px;">${n.title}</div>
+            <div style="font-size:0.77rem;color:#6b7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${n.text}</div>
+            <div style="font-size:0.7rem;color:#9ca3af;margin-top:3px;">${n.time}</div>
+          </div>
+          ${!n.read ? '<div style="width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0;margin-top:4px;"></div>' : ''}
+        </a>
+      `).join('')}
+    </div>
+  </div>
+</div>
+
+<!-- MARKET PRICES TICKER -->
+<div class="card" style="margin-top:22px;">
+  <div class="card-header">
+    <h3>📊 Live Market Prices</h3>
+    <a href="market-prices.html" style="font-size:0.8rem;color:#22c55e;font-weight:600;">Full market →</a>
+  </div>
+  <div class="card-body">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+      ${FamData.getMarketPrices().slice(0,8).map(p => {
+        const change = ((p.current - p.prev) / p.prev * 100).toFixed(1);
+        const up = p.current >= p.prev;
+        return `
+          <div style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;background:#f9fafb;border:1px solid #e5e7eb;">
+            <span style="font-size:1.6rem;">${p.emoji}</span>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:0.82rem;font-weight:700;color:#111;">${p.name}</div>
+              <div style="font-size:0.9rem;font-weight:800;color:${up?'#16a34a':'#dc2626'};">${FamData.formatMoney(p.current)}<span style="font-size:0.68rem;color:#9ca3af;font-weight:400;">/${p.unit}</span></div>
+              <div style="font-size:0.7rem;font-weight:600;color:${up?'#16a34a':'#dc2626'};">${up?'▲':'▼'} ${Math.abs(change)}%</div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  </div>
+</div>
+`;
+
+// Animate chart bars
+setTimeout(() => {
+  document.querySelectorAll('.chart-bar-anim').forEach(bar => {
+    bar.style.height = bar.dataset.h + '%';
+  });
+}, 200);
+
+// Animate counters
+document.querySelectorAll('[data-count]').forEach(el => {
+  const target = parseInt(el.dataset.count);
+  let current = 0;
+  const step = target / 50;
+  const timer = setInterval(() => {
+    current = Math.min(current + step, target);
+    el.textContent = Math.floor(current).toLocaleString('en-IN');
+    if (current >= target) clearInterval(timer);
+  }, 30);
+});
+</script>
+</body>
+</html>

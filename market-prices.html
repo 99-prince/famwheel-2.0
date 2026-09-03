@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Market Prices – FAM WHEEL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="dashboard.css"/>
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebarContainer"></div>
+  <div class="main-content">
+    <div id="headerContainer"></div>
+    <div class="page-content">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div><h1 class="page-title">📊 Live Market Prices</h1><p class="page-subtitle">Real-time crop prices across major agricultural markets in India</p></div>
+        <div style="display:flex;align-items:center;gap:8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:8px 14px;font-size:0.82rem;color:#16a34a;font-weight:600;">
+          <span style="width:8px;height:8px;background:#22c55e;border-radius:50%;animation:pulse 1.5s ease infinite;display:inline-block;"></span>
+          Live · Updated just now
+        </div>
+      </div>
+      <style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}</style>
+
+      <!-- SEARCH + FILTER -->
+      <div style="background:#fff;border-radius:14px;border:1px solid #e5e7eb;padding:16px 20px;margin-bottom:20px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+        <div style="display:flex;align-items:center;gap:8px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:9px 14px;flex:1;min-width:200px;">
+          <i class="fas fa-search" style="color:#9ca3af;font-size:0.85rem;"></i>
+          <input type="text" id="priceSearch" placeholder="Search commodity…" oninput="renderPrices()" style="border:none;background:none;outline:none;font-size:0.87rem;font-family:Inter,sans-serif;width:100%;"/>
+        </div>
+        <select id="priceSort" onchange="renderPrices()" style="padding:9px 14px;border:1px solid #e5e7eb;border-radius:10px;font-size:0.87rem;font-family:Inter,sans-serif;background:#fff;color:#374151;outline:none;cursor:pointer;">
+          <option value="name">Sort: A-Z</option>
+          <option value="price_asc">Price: Low → High</option>
+          <option value="price_desc">Price: High → Low</option>
+          <option value="change_up">Biggest Gains</option>
+          <option value="change_down">Biggest Falls</option>
+        </select>
+      </div>
+
+      <!-- GAINER/LOSER BANNER -->
+      <div class="grid-2" style="margin-bottom:22px;">
+        <div style="background:linear-gradient(135deg,#dcfce7,#bbf7d0);border-radius:16px;padding:20px 24px;border:1px solid #86efac;">
+          <div style="font-size:0.75rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">📈 Top Gainers Today</div>
+          ${FamData.getMarketPrices().filter(p=>p.current>p.prev).sort((a,b)=>((b.current-b.prev)/b.prev)-((a.current-a.prev)/a.prev)).slice(0,3).map(p=>{
+            const change = ((p.current-p.prev)/p.prev*100).toFixed(1);
+            return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="font-size:1.3rem;">${p.emoji}</span><span style="font-size:0.88rem;font-weight:700;color:#111;flex:1;">${p.name}</span><span style="font-size:0.88rem;font-weight:800;color:#16a34a;">▲ ${change}%</span></div>`;
+          }).join('')}
+        </div>
+        <div style="background:linear-gradient(135deg,#fee2e2,#fecaca);border-radius:16px;padding:20px 24px;border:1px solid #fca5a5;">
+          <div style="font-size:0.75rem;font-weight:700;color:#dc2626;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">📉 Top Losers Today</div>
+          ${FamData.getMarketPrices().filter(p=>p.current<p.prev).sort((a,b)=>((a.current-a.prev)/a.prev)-((b.current-b.prev)/b.prev)).slice(0,3).map(p=>{
+            const change = ((p.current-p.prev)/p.prev*100).toFixed(1);
+            return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="font-size:1.3rem;">${p.emoji}</span><span style="font-size:0.88rem;font-weight:700;color:#111;flex:1;">${p.name}</span><span style="font-size:0.88rem;font-weight:800;color:#dc2626;">▼ ${Math.abs(change)}%</span></div>`;
+          }).join('')}
+        </div>
+      </div>
+
+      <!-- PRICES TABLE -->
+      <div class="card">
+        <div class="card-header"><h3>All Commodities</h3><span style="font-size:0.8rem;color:#9ca3af;" id="priceCount"></span></div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Commodity</th><th>Region</th><th>Current Price</th><th>Previous</th><th>Change</th><th>Range (Min–Max)</th><th>Trend</th><th>Action</th></tr></thead>
+            <tbody id="pricesBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- DISCLAIMER -->
+      <div style="margin-top:16px;padding:14px 18px;background:#fef9c3;border-radius:12px;border:1px solid #fde68a;font-size:0.8rem;color:#854d0e;">
+        <i class="fas fa-info-circle"></i> <strong>Disclaimer:</strong> Prices shown are indicative market rates collected from various mandis. Actual transaction prices may vary based on quality, location, and negotiation. FAM WHEEL is not responsible for price discrepancies.
+      </div>
+    </div>
+  </div>
+</div>
+<script src="auth.js"></script>
+<script src="data.js"></script>
+<script src="shared-ui.js"></script>
+<script>
+const user = Auth.requireAuth();
+renderSidebar('market-prices');
+renderDashHeader('📊 Market Prices', 'Live crop commodity rates across India');
+
+function renderPrices() {
+  const search = document.getElementById('priceSearch').value.toLowerCase();
+  const sort   = document.getElementById('priceSort').value;
+  let list = FamData.getMarketPrices().filter(p => !search || p.name.toLowerCase().includes(search) || p.region.toLowerCase().includes(search));
+
+  if (sort === 'price_asc')    list.sort((a,b)=>a.current-b.current);
+  if (sort === 'price_desc')   list.sort((a,b)=>b.current-a.current);
+  if (sort === 'change_up')    list.sort((a,b)=>(b.current-b.prev)/b.prev-(a.current-a.prev)/a.prev);
+  if (sort === 'change_down')  list.sort((a,b)=>(a.current-a.prev)/a.prev-(b.current-b.prev)/b.prev);
+  if (sort === 'name')         list.sort((a,b)=>a.name.localeCompare(b.name));
+
+  document.getElementById('priceCount').textContent = list.length + ' commodities';
+  document.getElementById('pricesBody').innerHTML = list.map(p => {
+    const diff = p.current - p.prev;
+    const pct  = (diff/p.prev*100).toFixed(2);
+    const up   = diff >= 0;
+    const barPct = Math.round(((p.current-p.min)/(p.max-p.min))*100);
+    // Mini sparkline (just visual bar)
+    const sparkBars = [60,75,55,80,70,90,barPct].map(h=>`<div style="width:4px;height:${h*0.2}px;background:${up?'#22c55e':'#ef4444'};border-radius:2px;"></div>`).join('');
+    return `
+      <tr>
+        <td><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:1.6rem;">${p.emoji}</span><div><strong>${p.name}</strong></div></div></td>
+        <td><span style="font-size:0.8rem;color:#6b7280;"><i class="fas fa-map-marker-alt" style="color:#9ca3af;"></i> ${p.region}</span></td>
+        <td><strong style="font-size:1.05rem;">₹${p.current.toLocaleString('en-IN')}</strong><span style="font-size:0.72rem;color:#9ca3af;">/${p.unit}</span></td>
+        <td style="color:#9ca3af;">₹${p.prev.toLocaleString('en-IN')}</td>
+        <td>
+          <span style="font-size:0.85rem;font-weight:700;color:${up?'#16a34a':'#dc2626'};">${up?'▲':'▼'} ₹${Math.abs(diff).toFixed(0)}</span><br/>
+          <span class="badge ${up?'badge-green':'badge-red'}" style="font-size:0.7rem;">${up?'+':''}${pct}%</span>
+        </td>
+        <td>
+          <div style="font-size:0.78rem;color:#6b7280;margin-bottom:4px;">₹${p.min} – ₹${p.max}</div>
+          <div style="height:6px;background:#e5e7eb;border-radius:99px;overflow:hidden;width:120px;">
+            <div style="height:100%;width:${barPct}%;background:linear-gradient(90deg,${up?'#4ade80,#22c55e':'#f87171,#ef4444'});border-radius:99px;"></div>
+          </div>
+        </td>
+        <td><div style="display:flex;align-items:flex-end;gap:2px;height:20px;">${sparkBars}</div></td>
+        <td>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-sm btn-primary" onclick="window.location.href='marketplace.html?q=${p.name}'">Buy Now</button>
+            <button class="btn btn-sm btn-outline" onclick="showToast('Price alert set for ${p.name}!','success')"><i class="fas fa-bell"></i></button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+renderPrices();
+
+// Live price blink every 6s
+setInterval(() => {
+  document.querySelectorAll('#pricesBody tr').forEach(row => {
+    row.style.transition = 'background 0.3s';
+    row.style.background = '#f0fdf4';
+    setTimeout(()=>row.style.background='',500);
+  });
+}, 6000);
+</script>
+</body>
+</html>

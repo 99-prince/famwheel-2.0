@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Marketplace – FAM WHEEL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="dashboard.css"/>
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebarContainer"></div>
+  <div class="main-content">
+    <div id="headerContainer"></div>
+    <div class="page-content">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div>
+          <h1 class="page-title">🛒 Marketplace</h1>
+          <p class="page-subtitle">Browse fresh agricultural produce from verified farmers across India</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-outline" onclick="toggleView('grid')" id="gridViewBtn"><i class="fas fa-th"></i></button>
+          <button class="btn btn-outline" onclick="toggleView('list')" id="listViewBtn"><i class="fas fa-list"></i></button>
+        </div>
+      </div>
+
+      <!-- FILTERS -->
+      <div style="background:#fff;border-radius:16px;border:1px solid #e5e7eb;padding:18px 22px;margin-bottom:22px;">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+          <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:220px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:9px 14px;">
+            <i class="fas fa-search" style="color:#9ca3af;font-size:0.85rem;"></i>
+            <input type="text" id="searchInput" placeholder="Search crops, farmer, location…" style="border:none;background:none;outline:none;font-size:0.87rem;font-family:Inter,sans-serif;width:100%;color:#111;" oninput="filterCrops()"/>
+          </div>
+          <select class="filter-select" id="categoryFilter" onchange="filterCrops()" style="padding:9px 14px;border:1px solid #e5e7eb;border-radius:10px;font-size:0.87rem;font-family:Inter,sans-serif;background:#fff;color:#374151;outline:none;cursor:pointer;">
+            <option value="">All Categories</option>
+            <option>Grain</option><option>Vegetable</option><option>Oilseed</option>
+            <option>Spice</option><option>Pulse</option><option>Fruit</option>
+          </select>
+          <select class="filter-select" id="stateFilter" onchange="filterCrops()" style="padding:9px 14px;border:1px solid #e5e7eb;border-radius:10px;font-size:0.87rem;font-family:Inter,sans-serif;background:#fff;color:#374151;outline:none;cursor:pointer;">
+            <option value="">All States</option>
+            <option>Punjab</option><option>Maharashtra</option><option>UP</option>
+            <option>MP</option><option>Rajasthan</option><option>West Bengal</option>
+            <option>Andhra Pradesh</option><option>Gujarat</option><option>Kerala</option>
+            <option>Himachal Pradesh</option>
+          </select>
+          <select class="filter-select" id="sortFilter" onchange="filterCrops()" style="padding:9px 14px;border:1px solid #e5e7eb;border-radius:10px;font-size:0.87rem;font-family:Inter,sans-serif;background:#fff;color:#374151;outline:none;cursor:pointer;">
+            <option value="recent">Sort: Latest</option>
+            <option value="price_asc">Price: Low to High</option>
+            <option value="price_desc">Price: High to Low</option>
+            <option value="rating">Top Rated</option>
+          </select>
+          <button class="btn btn-outline" onclick="clearFilters()"><i class="fas fa-times"></i> Clear</button>
+        </div>
+        <!-- Category Quick Filters -->
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+          ${['All','Grain','Vegetable','Oilseed','Spice','Pulse','Fruit'].map(cat => `
+            <button onclick="quickFilter('${cat}')" class="qf-btn" data-cat="${cat}" style="padding:5px 14px;border-radius:99px;border:1px solid #e5e7eb;background:#fff;font-size:0.78rem;font-weight:600;color:#6b7280;cursor:pointer;transition:all 0.2s;">${cat}</button>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- RESULTS COUNT -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <span id="resultsCount" style="font-size:0.87rem;color:#6b7280;font-weight:500;"></span>
+        <span style="font-size:0.8rem;color:#22c55e;font-weight:600;"><i class="fas fa-circle" style="font-size:0.5rem;animation:pulse 1.5s ease infinite;"></i> Live prices updated</span>
+      </div>
+
+      <!-- CROP GRID -->
+      <div id="cropGrid" class="crop-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CROP DETAIL MODAL -->
+<div id="cropModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:8000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);">
+  <div style="background:#fff;border-radius:24px;max-width:640px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,0.25);" id="cropModalContent"></div>
+</div>
+
+<script src="auth.js"></script>
+<script src="data.js"></script>
+<script src="shared-ui.js"></script>
+<script>
+const user = Auth.requireAuth();
+renderSidebar('marketplace');
+renderDashHeader('🛒 Marketplace', 'Browse fresh produce from verified farmers');
+
+let currentView = 'grid';
+let allCrops = FamData.getCrops();
+
+function filterCrops() {
+  const search   = document.getElementById('searchInput').value.toLowerCase();
+  const category = document.getElementById('categoryFilter').value;
+  const state    = document.getElementById('stateFilter').value;
+  const sort     = document.getElementById('sortFilter').value;
+
+  let filtered = FamData.getCrops().filter(c => {
+    const matchSearch = !search || c.name.toLowerCase().includes(search) || c.farmer.toLowerCase().includes(search) || c.city.toLowerCase().includes(search) || c.state.toLowerCase().includes(search);
+    const matchCat  = !category || c.category === category;
+    const matchState= !state || c.state === state;
+    return matchSearch && matchCat && matchState;
+  });
+
+  if (sort === 'price_asc')  filtered.sort((a,b) => a.price - b.price);
+  if (sort === 'price_desc') filtered.sort((a,b) => b.price - a.price);
+  if (sort === 'rating')     filtered.sort((a,b) => b.rating - a.rating);
+
+  renderGrid(filtered);
+}
+
+function quickFilter(cat) {
+  document.querySelectorAll('.qf-btn').forEach(b => {
+    const active = b.dataset.cat === cat;
+    b.style.background = active ? '#22c55e' : '#fff';
+    b.style.color = active ? '#fff' : '#6b7280';
+    b.style.borderColor = active ? '#22c55e' : '#e5e7eb';
+  });
+  document.getElementById('categoryFilter').value = cat === 'All' ? '' : cat;
+  filterCrops();
+}
+
+function clearFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('categoryFilter').value = '';
+  document.getElementById('stateFilter').value = '';
+  document.getElementById('sortFilter').value = 'recent';
+  quickFilter('All');
+}
+
+function toggleView(v) {
+  currentView = v;
+  const grid = document.getElementById('cropGrid');
+  if (v === 'list') {
+    grid.style.gridTemplateColumns = '1fr';
+  } else {
+    grid.style.gridTemplateColumns = 'repeat(3,1fr)';
+  }
+}
+
+function renderGrid(crops) {
+  const grid = document.getElementById('cropGrid');
+  document.getElementById('resultsCount').textContent = `Showing ${crops.length} crop${crops.length !== 1 ? 's' : ''}`;
+  if (!crops.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><div class="empty-icon">🌱</div><h3>No crops found</h3><p>Try changing your filters or search term</p><button class="btn btn-primary" onclick="clearFilters()">Clear Filters</button></div>`;
+    return;
+  }
+  const bgMap = {Grain:'grain-bg',Vegetable:'vegetable-bg',Oilseed:'oilseed-bg',Spice:'spice-bg',Pulse:'pulse-bg',Fruit:'fruit-bg'};
+  grid.innerHTML = crops.map(c => `
+    <div class="crop-card" onclick="openCrop(${c.id})">
+      <div class="crop-card-img ${bgMap[c.category]||'vegetable-bg'}">
+        <span style="font-size:4.5rem;">${c.emoji}</span>
+        <span style="position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.9);border-radius:99px;padding:3px 10px;font-size:0.72rem;font-weight:700;color:#374151;">${c.category}</span>
+        <span style="position:absolute;top:10px;left:10px;background:rgba(34,197,94,0.9);border-radius:99px;padding:3px 8px;font-size:0.65rem;font-weight:700;color:#fff;"><i class="fas fa-circle" style="font-size:0.4rem;"></i> LIVE</span>
+      </div>
+      <div class="crop-card-body">
+        <h3>${c.name} <span style="font-size:0.78rem;background:#f0fdf4;color:#16a34a;padding:2px 8px;border-radius:99px;font-weight:600;">${c.quality}</span></h3>
+        <div class="farmer-name"><i class="fas fa-user-circle" style="color:#9ca3af;"></i> ${c.farmer} · <i class="fas fa-map-marker-alt" style="color:#9ca3af;"></i> ${c.city}, ${c.state}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="crop-price">₹${c.price.toLocaleString('en-IN')} <span>/ ${c.unit}</span></div>
+          <div class="crop-rating"><i class="fas fa-star"></i> ${c.rating} <span style="color:#9ca3af;">(${c.reviews})</span></div>
+        </div>
+        <div class="crop-meta">
+          <span style="font-size:0.75rem;color:#6b7280;background:#f3f4f6;padding:3px 10px;border-radius:99px;"><i class="fas fa-boxes"></i> ${c.qty} ${c.unit} avail.</span>
+          <span style="font-size:0.75rem;color:#6b7280;background:#f3f4f6;padding:3px 10px;border-radius:99px;">Min: ${c.minQty} ${c.unit}</span>
+        </div>
+      </div>
+      <div class="crop-card-footer">
+        <button class="btn btn-primary" style="flex:1;font-size:0.82rem;" onclick="event.stopPropagation();openCrop(${c.id})"><i class="fas fa-eye"></i> View Details</button>
+        <button class="btn btn-outline" style="font-size:0.82rem;" onclick="event.stopPropagation();makeOffer(${c.id})"><i class="fas fa-handshake"></i> Offer</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openCrop(id) {
+  const c = FamData.getCrop(id);
+  if (!c) return;
+  const modal = document.getElementById('cropModal');
+  const bgMap = {Grain:'grain-bg',Vegetable:'vegetable-bg',Oilseed:'oilseed-bg',Spice:'spice-bg',Pulse:'pulse-bg',Fruit:'fruit-bg'};
+  document.getElementById('cropModalContent').innerHTML = `
+    <div class="crop-card-img ${bgMap[c.category]||'vegetable-bg'}" style="height:160px;border-radius:24px 24px 0 0;">
+      <span style="font-size:5rem;">${c.emoji}</span>
+    </div>
+    <div style="padding:28px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
+        <div>
+          <h2 style="font-size:1.5rem;font-weight:800;color:#111;margin-bottom:4px;">${c.name}</h2>
+          <div style="font-size:0.82rem;color:#6b7280;display:flex;align-items:center;gap:10px;">
+            <span><i class="fas fa-user-circle"></i> ${c.farmer}</span>
+            <span><i class="fas fa-map-marker-alt"></i> ${c.city}, ${c.state}</span>
+          </div>
+        </div>
+        <button onclick="document.getElementById('cropModal').style.display='none'" style="background:#f3f4f6;border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">✕</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">
+        <div style="background:#f0fdf4;border-radius:12px;padding:14px;text-align:center;">
+          <div style="font-size:1.5rem;font-weight:800;color:#16a34a;">₹${c.price.toLocaleString('en-IN')}</div>
+          <div style="font-size:0.75rem;color:#6b7280;">Per ${c.unit}</div>
+        </div>
+        <div style="background:#f9fafb;border-radius:12px;padding:14px;text-align:center;">
+          <div style="font-size:1.5rem;font-weight:800;color:#111;">${c.qty}</div>
+          <div style="font-size:0.75rem;color:#6b7280;">${c.unit} Available</div>
+        </div>
+        <div style="background:#fef9c3;border-radius:12px;padding:14px;text-align:center;">
+          <div style="font-size:1.2rem;font-weight:800;color:#d97706;">★ ${c.rating}</div>
+          <div style="font-size:0.75rem;color:#6b7280;">${c.reviews} Reviews</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <h4 style="font-size:0.87rem;font-weight:700;color:#374151;margin-bottom:6px;">Description</h4>
+        <p style="font-size:0.87rem;color:#6b7280;line-height:1.7;">${c.description}</p>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;">
+        <span style="background:#f0fdf4;color:#16a34a;padding:4px 12px;border-radius:99px;font-size:0.77rem;font-weight:600;">Quality: ${c.quality}</span>
+        <span style="background:#dbeafe;color:#1d4ed8;padding:4px 12px;border-radius:99px;font-size:0.77rem;font-weight:600;">Min Order: ${c.minQty} ${c.unit}</span>
+        <span style="background:#f3e8ff;color:#7e22ce;padding:4px 12px;border-radius:99px;font-size:0.77rem;font-weight:600;">Category: ${c.category}</span>
+      </div>
+
+      <div style="background:#f9fafb;border-radius:12px;padding:16px;margin-bottom:20px;">
+        <h4 style="font-size:0.87rem;font-weight:700;color:#374151;margin-bottom:10px;">Make an Offer</h4>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <input type="number" id="offerQty" placeholder="Quantity (${c.unit})" min="${c.minQty}" max="${c.qty}" style="flex:1;min-width:100px;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:0.87rem;font-family:Inter,sans-serif;outline:none;"/>
+          <input type="number" id="offerPrice" placeholder="Your price/qtl" value="${c.price}" style="flex:1;min-width:100px;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:0.87rem;font-family:Inter,sans-serif;outline:none;"/>
+        </div>
+        <textarea id="offerMsg" placeholder="Add a message to the farmer…" style="width:100%;margin-top:10px;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:0.87rem;font-family:Inter,sans-serif;outline:none;resize:none;height:70px;"></textarea>
+      </div>
+
+      <div style="display:flex;gap:12px;">
+        <button class="btn btn-primary" style="flex:1;" onclick="submitOffer(${c.id})"><i class="fas fa-handshake"></i> Send Offer</button>
+        <button class="btn btn-outline" onclick="window.location.href='messages.html'"><i class="fas fa-comments"></i> Message</button>
+        <button class="btn btn-outline" onclick="document.getElementById('cropModal').style.display='none'">Close</button>
+      </div>
+    </div>
+  `;
+  modal.style.display = 'flex';
+  modal.onclick = e => { if(e.target === modal) modal.style.display='none'; };
+}
+
+function makeOffer(id) { openCrop(id); }
+
+function submitOffer(cropId) {
+  const qty   = document.getElementById('offerQty').value;
+  const price = document.getElementById('offerPrice').value;
+  if (!qty || !price) { showToast('Please fill quantity and price', 'error'); return; }
+  document.getElementById('cropModal').style.display = 'none';
+  showToast(`✅ Offer sent for ${qty} units at ₹${price}! Farmer will respond shortly.`, 'success');
+}
+
+// Init
+renderGrid(FamData.getCrops());
+
+// Check URL params for search
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('q')) {
+  document.getElementById('searchInput').value = urlParams.get('q');
+  filterCrops();
+}
+
+quickFilter('All');
+</script>
+</body>
+</html>

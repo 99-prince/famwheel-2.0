@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FAM WHEEL – From Farm to Market, Without the Hassle</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <!-- ========== PRELOADER ========== -->
+  <div id="preloader">
+    <div class="preloader-inner">
+      <div class="preloader-logo">
+        <span class="logo-icon">🚜</span>
+        <span class="logo-text">FAM<span>WHEEL</span></span>
+      </div>
+      <div class="preloader-bar"><div class="preloader-fill"></div></div>
+      <p class="preloader-tagline">From Farm to Market, Without the Hassle</p>
+    </div>
+  </div>
+
+  <!-- ========== NAVBAR ========== -->
+  <nav id="navbar">
+    <div class="nav-container">
+      <a href="#" class="nav-logo">
+        <span class="logo-icon">🚜</span>
+        <span>FAM<span class="logo-accent">WHEEL</span></span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#roles">Roles</a></li>
+        <li><a href="#market">Market</a></li>
+        <li><a href="#testimonials">Reviews</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="login.html" class="btn-outline">Login</a>
+        <a href="register.html" class="btn-primary">Get Started</a>
+        <a href="dashboard.html" class="btn-primary" style="background:#f59e0b;border-color:#f59e0b;" title="Quick Demo: Click to go directly to Dashboard">⚡ Demo</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ========== HERO ========== -->
+  <section id="hero">
+    <div class="hero-bg">
+      <div class="hero-particles" id="particles"></div>
+      <div class="hero-gradient"></div>
+    </div>
+    <div class="hero-container">
+      <div class="hero-content" data-aos="fade-right">
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          🌾 Smart Agricultural Marketplace
+        </div>
+        <h1 class="hero-title">
+          Connecting <span class="gradient-text">Farmers</span><br/>
+          to <span class="gradient-text">Markets</span> Directly
+        </h1>
+        <p class="hero-subtitle">
+          FAM WHEEL bridges the gap between farmers, buyers, and transport providers — creating a transparent, efficient, and fair agricultural trading ecosystem.
+        </p>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <span class="stat-num" data-target="10000">0</span><span>+</span>
+            <span class="stat-label">Farmers</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-num" data-target="5000">0</span><span>+</span>
+            <span class="stat-label">Buyers</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-num" data-target="500">0</span><span>+</span>
+            <span class="stat-label">Transport Providers</span>
+          </div>
+        </div>
+        <div class="hero-cta">
+          <a href="register.html" class="btn-hero-primary">
+            <i class="fas fa-seedling"></i> Start Selling / Buying
+          </a>
+          <a href="#how-it-works" class="btn-hero-ghost">
+            <i class="fas fa-play-circle"></i> See How It Works
+          </a>
+        </div>
+      </div>
+      <div class="hero-visual" data-aos="fade-left">
+        <div class="hero-card-stack">
+          <div class="floating-card card-1">
+            <div class="card-icon">🌾</div>
+            <div class="card-info">
+              <span class="card-label">Fresh Wheat Listed</span>
+              <span class="card-value">₹2,100 / quintal</span>
+            </div>
+            <span class="card-badge live">LIVE</span>
+          </div>
+          <div class="floating-card card-2">
+            <div class="card-icon">🍅</div>
+            <div class="card-info">
+              <span class="card-label">Tomatoes Available</span>
+              <span class="card-value">₹45 / kg</span>
+            </div>
+            <span class="card-badge new">NEW</span>
+          </div>
+          <div class="floating-card card-3">
+            <div class="card-icon">🚚</div>
+            <div class="card-info">
+              <span class="card-label">Transport Ready</span>
+              <span class="card-value">Pune → Mumbai</span>
+            </div>
+            <span class="card-badge avail">AVAILABLE</span>
+          </div>
+          <div class="hero-circle-bg"></div>
+          <div class="hero-farm-img">
+            <div class="farm-icon-grid">
+              <div class="farm-icon">🌾</div>
+              <div class="farm-icon">🌽</div>
+              <div class="farm-icon">🍅</div>
+              <div class="farm-icon">🥕</div>
+              <div class="farm-icon">🥔</div>
+              <div class="farm-icon">🧅</div>
+              <div class="farm-icon">🍇</div>
+              <div class="farm-icon">🫚</div>
+              <div class="farm-icon">🌱</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-scroll-hint">
+      <div class="scroll-arrow"></div>
+      <span>Scroll to explore</span>
+    </div>
+  </section>
+
+  <!-- ========== MARQUEE TICKER ========== -->
+  <div class="ticker-wrap">
+    <div class="ticker">
+      <span>🌾 Wheat – ₹2,100/qtl</span>
+      <span>🍅 Tomato – ₹45/kg</span>
+      <span>🥔 Potato – ₹22/kg</span>
+      <span>🌽 Maize – ₹1,800/qtl</span>
+      <span>🧅 Onion – ₹30/kg</span>
+      <span>🥕 Carrot – ₹35/kg</span>
+      <span>🍇 Grapes – ₹80/kg</span>
+      <span>🌱 Soybean – ₹4,500/qtl</span>
+      <span>🫘 Lentils – ₹6,000/qtl</span>
+      <span>🌾 Rice – ₹3,200/qtl</span>
+      <span>🌶️ Chilli – ₹120/kg</span>
+      <span>🥜 Groundnut – ₹5,500/qtl</span>
+      <span>🌾 Wheat – ₹2,100/qtl</span>
+      <span>🍅 Tomato – ₹45/kg</span>
+      <span>🥔 Potato – ₹22/kg</span>
+      <span>🌽 Maize – ₹1,800/qtl</span>
+      <span>🧅 Onion – ₹30/kg</span>
+      <span>🥕 Carrot – ₹35/kg</span>
+    </div>
+  </div>
+
+  <!-- ========== FEATURES ========== -->
+  <section id="features" class="section">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <div class="section-badge">✨ Key Features</div>
+        <h2 class="section-title">Everything You Need in One Platform</h2>
+        <p class="section-subtitle">Powerful tools designed for every participant in the agricultural supply chain</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="0">
+          <div class="feature-icon-wrap" style="--clr:#22c55e">
+            <i class="fas fa-seedling"></i>
+          </div>
+          <h3>Crop Listing & Management</h3>
+          <p>Easily list your produce with photos, prices, quantities, and availability. Manage all your listings from one dashboard.</p>
+          <div class="feature-tags"><span>Farmer</span><span>Real-time</span></div>
+        </div>
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="80">
+          <div class="feature-icon-wrap" style="--clr:#f59e0b">
+            <i class="fas fa-search"></i>
+          </div>
+          <h3>Smart Search & Filtering</h3>
+          <p>Advanced filtering by crop type, price range, location, quality, and availability. Find exactly what you need, fast.</p>
+          <div class="feature-tags"><span>Buyer</span><span>Location-aware</span></div>
+        </div>
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="160">
+          <div class="feature-icon-wrap" style="--clr:#3b82f6">
+            <i class="fas fa-handshake"></i>
+          </div>
+          <h3>Price Negotiation</h3>
+          <p>Built-in negotiation system allowing buyers and farmers to communicate and agree on fair prices in real-time.</p>
+          <div class="feature-tags"><span>Farmer</span><span>Buyer</span></div>
+        </div>
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="0">
+          <div class="feature-icon-wrap" style="--clr:#8b5cf6">
+            <i class="fas fa-truck"></i>
+          </div>
+          <h3>Transport Integration</h3>
+          <p>Request, track, and manage crop transportation directly through the platform. No more middlemen for logistics.</p>
+          <div class="feature-tags"><span>Transport</span><span>Tracking</span></div>
+        </div>
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="80">
+          <div class="feature-icon-wrap" style="--clr:#ec4899">
+            <i class="fas fa-comments"></i>
+          </div>
+          <h3>Direct Messaging</h3>
+          <p>Secure chat between farmers, buyers, and transport providers. Build relationships and communicate without leaving the platform.</p>
+          <div class="feature-tags"><span>Chat</span><span>Secure</span></div>
+        </div>
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="160">
+          <div class="feature-icon-wrap" style="--clr:#14b8a6">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <h3>Market Insights</h3>
+          <p>Real-time price trends, demand analytics, and market intelligence to help you make smarter buying and selling decisions.</p>
+          <div class="feature-tags"><span>Analytics</span><span>Insights</span></div>
+        </div>
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="0">
+          <div class="feature-icon-wrap" style="--clr:#f97316">
+            <i class="fas fa-star"></i>
+          </div>
+          <h3>Ratings & Reviews</h3>
+          <p>Transparent feedback system to build trust. Rate your experience after every transaction for a reliable community.</p>
+          <div class="feature-tags"><span>Trust</span><span>Community</span></div>
+        </div>
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="80">
+          <div class="feature-icon-wrap" style="--clr:#06b6d4">
+            <i class="fas fa-bell"></i>
+          </div>
+          <h3>Smart Notifications</h3>
+          <p>Get instant alerts on new offers, order updates, price changes, and transport status. Stay informed at every step.</p>
+          <div class="feature-tags"><span>Real-time</span><span>Alerts</span></div>
+        </div>
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="160">
+          <div class="feature-icon-wrap" style="--clr:#84cc16">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h3>User Verification</h3>
+          <p>Multi-layer verification system ensures only genuine farmers, buyers, and transport providers on the platform.</p>
+          <div class="feature-tags"><span>Security</span><span>Trust</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== HOW IT WORKS ========== -->
+  <section id="how-it-works" class="section section-dark">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <div class="section-badge light">🔄 Workflow</div>
+        <h2 class="section-title light">How FAM WHEEL Works</h2>
+        <p class="section-subtitle light">A simple, transparent process from farm to market</p>
+      </div>
+      <div class="workflow-steps">
+        <div class="workflow-step" data-aos="fade-up" data-aos-delay="0">
+          <div class="step-num">01</div>
+          <div class="step-icon"><i class="fas fa-user-plus"></i></div>
+          <h3>Register & Verify</h3>
+          <p>Create your profile as a farmer, buyer, or transport provider. Complete verification for full access.</p>
+        </div>
+        <div class="workflow-arrow"><i class="fas fa-chevron-right"></i></div>
+        <div class="workflow-step" data-aos="fade-up" data-aos-delay="100">
+          <div class="step-num">02</div>
+          <div class="step-icon"><i class="fas fa-list"></i></div>
+          <h3>List Crops</h3>
+          <p>Farmers post their available produce with photos, quality details, pricing, and location.</p>
+        </div>
+        <div class="workflow-arrow"><i class="fas fa-chevron-right"></i></div>
+        <div class="workflow-step" data-aos="fade-up" data-aos-delay="200">
+          <div class="step-num">03</div>
+          <div class="step-icon"><i class="fas fa-search"></i></div>
+          <h3>Discover & Offer</h3>
+          <p>Buyers search, compare, and send purchase offers or negotiate prices directly with farmers.</p>
+        </div>
+        <div class="workflow-arrow"><i class="fas fa-chevron-right"></i></div>
+        <div class="workflow-step" data-aos="fade-up" data-aos-delay="300">
+          <div class="step-num">04</div>
+          <div class="step-icon"><i class="fas fa-check-circle"></i></div>
+          <h3>Confirm Order</h3>
+          <p>Both parties agree on terms, quantity, and price. Order is locked and confirmed securely.</p>
+        </div>
+        <div class="workflow-arrow"><i class="fas fa-chevron-right"></i></div>
+        <div class="workflow-step" data-aos="fade-up" data-aos-delay="400">
+          <div class="step-num">05</div>
+          <div class="step-icon"><i class="fas fa-truck"></i></div>
+          <h3>Arrange Transport</h3>
+          <p>Request transport through the platform. Providers bid, get assigned, and pick up the crop.</p>
+        </div>
+        <div class="workflow-arrow"><i class="fas fa-chevron-right"></i></div>
+        <div class="workflow-step" data-aos="fade-up" data-aos-delay="500">
+          <div class="step-num">06</div>
+          <div class="step-icon"><i class="fas fa-box-check"></i></div>
+          <h3>Delivered!</h3>
+          <p>Crop is delivered. Payment is processed. Both parties rate the experience. Done!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== USER ROLES ========== -->
+  <section id="roles" class="section">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <div class="section-badge">👥 User Roles</div>
+        <h2 class="section-title">Built for Everyone in Agriculture</h2>
+        <p class="section-subtitle">Each role has a dedicated experience tailored to their needs</p>
+      </div>
+      <div class="roles-tabs">
+        <div class="tab-buttons" data-aos="fade-up">
+          <button class="tab-btn active" data-tab="farmer">
+            <i class="fas fa-tractor"></i> Farmer
+          </button>
+          <button class="tab-btn" data-tab="buyer">
+            <i class="fas fa-shopping-cart"></i> Buyer
+          </button>
+          <button class="tab-btn" data-tab="transport">
+            <i class="fas fa-truck"></i> Transport
+          </button>
+          <button class="tab-btn" data-tab="admin">
+            <i class="fas fa-user-shield"></i> Admin
+          </button>
+        </div>
+        <div class="tab-content-wrap" data-aos="fade-up" data-aos-delay="100">
+          <div class="tab-content active" id="tab-farmer">
+            <div class="role-panel">
+              <div class="role-visual farmer-visual">
+                <div class="role-emoji-big">👨‍🌾</div>
+                <div class="role-bg-pattern"></div>
+              </div>
+              <div class="role-details">
+                <h3>Farmer Dashboard</h3>
+                <p>Everything a farmer needs to run their digital storefront and manage crop sales efficiently.</p>
+                <ul class="role-features">
+                  <li><i class="fas fa-check"></i> Create and manage crop listings</li>
+                  <li><i class="fas fa-check"></i> Receive and review buyer offers</li>
+                  <li><i class="fas fa-check"></i> Track order status in real-time</li>
+                  <li><i class="fas fa-check"></i> Request and monitor transportation</li>
+                  <li><i class="fas fa-check"></i> Chat directly with buyers</li>
+                  <li><i class="fas fa-check"></i> View earnings and analytics</li>
+                  <li><i class="fas fa-check"></i> Get notified on key events</li>
+                </ul>
+                <a href="register.html?role=farmer" class="btn-role">Join as Farmer <i class="fas fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="tab-content" id="tab-buyer">
+            <div class="role-panel">
+              <div class="role-visual buyer-visual">
+                <div class="role-emoji-big">🛒</div>
+                <div class="role-bg-pattern"></div>
+              </div>
+              <div class="role-details">
+                <h3>Buyer Marketplace</h3>
+                <p>Discover, compare, and purchase fresh agricultural produce directly from verified farmers.</p>
+                <ul class="role-features">
+                  <li><i class="fas fa-check"></i> Browse thousands of crop listings</li>
+                  <li><i class="fas fa-check"></i> Advanced search and location filters</li>
+                  <li><i class="fas fa-check"></i> Compare prices across farmers</li>
+                  <li><i class="fas fa-check"></i> Make offers and negotiate prices</li>
+                  <li><i class="fas fa-check"></i> Manage orders and deliveries</li>
+                  <li><i class="fas fa-check"></i> Rate and review farmers</li>
+                  <li><i class="fas fa-check"></i> Save favourite listings</li>
+                </ul>
+                <a href="register.html?role=buyer" class="btn-role">Join as Buyer <i class="fas fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="tab-content" id="tab-transport">
+            <div class="role-panel">
+              <div class="role-visual transport-visual">
+                <div class="role-emoji-big">🚚</div>
+                <div class="role-bg-pattern"></div>
+              </div>
+              <div class="role-details">
+                <h3>Transport Provider</h3>
+                <p>Register your fleet, accept delivery jobs, and earn by connecting farms to markets.</p>
+                <ul class="role-features">
+                  <li><i class="fas fa-check"></i> Register vehicles and capacity</li>
+                  <li><i class="fas fa-check"></i> Browse available delivery requests</li>
+                  <li><i class="fas fa-check"></i> Bid on or accept jobs instantly</li>
+                  <li><i class="fas fa-check"></i> Update delivery status live</li>
+                  <li><i class="fas fa-check"></i> Manage routes and schedules</li>
+                  <li><i class="fas fa-check"></i> Track earnings and payments</li>
+                  <li><i class="fas fa-check"></i> Build reputation with ratings</li>
+                </ul>
+                <a href="register.html?role=transport" class="btn-role">Join as Provider <i class="fas fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="tab-content" id="tab-admin">
+            <div class="role-panel">
+              <div class="role-visual admin-visual">
+                <div class="role-emoji-big">👨‍💼</div>
+                <div class="role-bg-pattern"></div>
+              </div>
+              <div class="role-details">
+                <h3>Admin Control Panel</h3>
+                <p>Complete oversight of the platform, users, listings, orders, and analytics.</p>
+                <ul class="role-features">
+                  <li><i class="fas fa-check"></i> Manage all users and verifications</li>
+                  <li><i class="fas fa-check"></i> Moderate crop listings and reports</li>
+                  <li><i class="fas fa-check"></i> Monitor orders and disputes</li>
+                  <li><i class="fas fa-check"></i> Platform-wide analytics dashboard</li>
+                  <li><i class="fas fa-check"></i> Manage transport providers</li>
+                  <li><i class="fas fa-check"></i> Configurable platform settings</li>
+                  <li><i class="fas fa-check"></i> Market insights and reports</li>
+                </ul>
+                <a href="admin.html" class="btn-role">Admin Login <i class="fas fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== MARKET INSIGHTS ========== -->
+  <section id="market" class="section section-green">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <div class="section-badge">📈 Market Insights</div>
+        <h2 class="section-title">Live Market Pulse</h2>
+        <p class="section-subtitle">Real-time crop prices and market trends across India</p>
+      </div>
+      <div class="market-grid">
+        <div class="market-card" data-aos="fade-up" data-aos-delay="0">
+          <div class="market-card-header">
+            <span class="crop-emoji">🌾</span>
+            <div>
+              <h4>Wheat</h4>
+              <span class="market-region">Punjab, India</span>
+            </div>
+            <span class="price-change up"><i class="fas fa-arrow-up"></i> 3.2%</span>
+          </div>
+          <div class="market-price">₹2,100 <span>/qtl</span></div>
+          <div class="price-bar"><div class="price-fill" style="width:72%"></div></div>
+          <div class="market-meta">
+            <span>Min: ₹1,900</span><span>Max: ₹2,350</span>
+          </div>
+        </div>
+        <div class="market-card" data-aos="fade-up" data-aos-delay="80">
+          <div class="market-card-header">
+            <span class="crop-emoji">🍅</span>
+            <div>
+              <h4>Tomato</h4>
+              <span class="market-region">Maharashtra, India</span>
+            </div>
+            <span class="price-change down"><i class="fas fa-arrow-down"></i> 1.8%</span>
+          </div>
+          <div class="market-price">₹45 <span>/kg</span></div>
+          <div class="price-bar"><div class="price-fill" style="width:45%"></div></div>
+          <div class="market-meta">
+            <span>Min: ₹30</span><span>Max: ₹70</span>
+          </div>
+        </div>
+        <div class="market-card" data-aos="fade-up" data-aos-delay="160">
+          <div class="market-card-header">
+            <span class="crop-emoji">🧅</span>
+            <div>
+              <h4>Onion</h4>
+              <span class="market-region">Nashik, India</span>
+            </div>
+            <span class="price-change up"><i class="fas fa-arrow-up"></i> 5.4%</span>
+          </div>
+          <div class="market-price">₹30 <span>/kg</span></div>
+          <div class="price-bar"><div class="price-fill" style="width:55%"></div></div>
+          <div class="market-meta">
+            <span>Min: ₹18</span><span>Max: ₹50</span>
+          </div>
+        </div>
+        <div class="market-card" data-aos="fade-up" data-aos-delay="240">
+          <div class="market-card-header">
+            <span class="crop-emoji">🥔</span>
+            <div>
+              <h4>Potato</h4>
+              <span class="market-region">UP, India</span>
+            </div>
+            <span class="price-change down"><i class="fas fa-arrow-down"></i> 0.9%</span>
+          </div>
+          <div class="market-price">₹22 <span>/kg</span></div>
+          <div class="price-bar"><div class="price-fill" style="width:38%"></div></div>
+          <div class="market-meta">
+            <span>Min: ₹14</span><span>Max: ₹35</span>
+          </div>
+        </div>
+        <div class="market-card" data-aos="fade-up" data-aos-delay="320">
+          <div class="market-card-header">
+            <span class="crop-emoji">🌽</span>
+            <div>
+              <h4>Maize</h4>
+              <span class="market-region">MP, India</span>
+            </div>
+            <span class="price-change up"><i class="fas fa-arrow-up"></i> 2.1%</span>
+          </div>
+          <div class="market-price">₹1,800 <span>/qtl</span></div>
+          <div class="price-bar"><div class="price-fill" style="width:62%"></div></div>
+          <div class="market-meta">
+            <span>Min: ₹1,600</span><span>Max: ₹2,100</span>
+          </div>
+        </div>
+        <div class="market-card" data-aos="fade-up" data-aos-delay="400">
+          <div class="market-card-header">
+            <span class="crop-emoji">🌱</span>
+            <div>
+              <h4>Soybean</h4>
+              <span class="market-region">Rajasthan, India</span>
+            </div>
+            <span class="price-change up"><i class="fas fa-arrow-up"></i> 4.7%</span>
+          </div>
+          <div class="market-price">₹4,500 <span>/qtl</span></div>
+          <div class="price-bar"><div class="price-fill" style="width:80%"></div></div>
+          <div class="market-meta">
+            <span>Min: ₹3,800</span><span>Max: ₹5,200</span>
+          </div>
+        </div>
+      </div>
+      <div class="market-cta" data-aos="fade-up">
+        <a href="market.html" class="btn-primary-lg">View Full Market Dashboard <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== TESTIMONIALS ========== -->
+  <section id="testimonials" class="section">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <div class="section-badge">⭐ Testimonials</div>
+        <h2 class="section-title">Voices from the Field</h2>
+        <p class="section-subtitle">Real stories from farmers, buyers, and transport providers</p>
+      </div>
+      <div class="testimonials-slider" data-aos="fade-up">
+        <div class="testimonial-track" id="testimonialTrack">
+          <div class="testimonial-card">
+            <div class="testi-quote"><i class="fas fa-quote-left"></i></div>
+            <p>"FAM WHEEL completely changed how I sell my wheat. I now connect directly with buyers in Mumbai and get better prices without any middlemen. My income has increased by 40% this season!"</p>
+            <div class="testi-author">
+              <div class="testi-avatar">👨‍🌾</div>
+              <div>
+                <strong>Rajesh Kumar</strong>
+                <span>Wheat Farmer, Punjab</span>
+                <div class="testi-stars">★★★★★</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testi-quote"><i class="fas fa-quote-left"></i></div>
+            <p>"As a restaurant owner, I source all my vegetables through FAM WHEEL. The quality is fresh, prices are transparent, and I can negotiate directly with farmers. Incredible platform!"</p>
+            <div class="testi-author">
+              <div class="testi-avatar">👩‍💼</div>
+              <div>
+                <strong>Priya Sharma</strong>
+                <span>Restaurant Owner, Mumbai</span>
+                <div class="testi-stars">★★★★★</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testi-quote"><i class="fas fa-quote-left"></i></div>
+            <p>"I registered my truck fleet on FAM WHEEL and now I have consistent delivery jobs. The platform shows me nearby orders and I can accept them with one click. My business has grown 3x!"</p>
+            <div class="testi-author">
+              <div class="testi-avatar">🚚</div>
+              <div>
+                <strong>Mohan Singh</strong>
+                <span>Transport Provider, Delhi</span>
+                <div class="testi-stars">★★★★☆</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testi-quote"><i class="fas fa-quote-left"></i></div>
+            <p>"The onion prices I found on FAM WHEEL were 25% cheaper than the local mandi. Now I source directly from Nashik farmers and the quality is always consistent. Highly recommend!"</p>
+            <div class="testi-author">
+              <div class="testi-avatar">🏪</div>
+              <div>
+                <strong>Anil Mehta</strong>
+                <span>Wholesale Buyer, Pune</span>
+                <div class="testi-stars">★★★★★</div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-card">
+            <div class="testi-quote"><i class="fas fa-quote-left"></i></div>
+            <p>"I used to lose a lot of my tomato crop because I couldn't find buyers in time. FAM WHEEL connects me to buyers before harvest and I never waste produce anymore. Life changing!"</p>
+            <div class="testi-author">
+              <div class="testi-avatar">🍅</div>
+              <div>
+                <strong>Sunita Patil</strong>
+                <span>Tomato Farmer, Maharashtra</span>
+                <div class="testi-stars">★★★★★</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slider-controls">
+          <button class="slider-btn" id="prevBtn"><i class="fas fa-chevron-left"></i></button>
+          <div class="slider-dots" id="sliderDots"></div>
+          <button class="slider-btn" id="nextBtn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== TECH STACK ========== -->
+  <section id="tech" class="section section-dark">
+    <div class="container">
+      <div class="section-header" data-aos="fade-up">
+        <div class="section-badge light">🛠️ Tech Stack</div>
+        <h2 class="section-title light">Built with Modern Technology</h2>
+        <p class="section-subtitle light">Scalable, secure, and performant from day one</p>
+      </div>
+      <div class="tech-grid" data-aos="fade-up">
+        <div class="tech-item"><span class="tech-icon">⚛️</span><span>React</span></div>
+        <div class="tech-item"><span class="tech-icon">📘</span><span>TypeScript</span></div>
+        <div class="tech-item"><span class="tech-icon">⚡</span><span>Vite</span></div>
+        <div class="tech-item"><span class="tech-icon">🎨</span><span>Tailwind CSS</span></div>
+        <div class="tech-item"><span class="tech-icon">🟩</span><span>Node.js</span></div>
+        <div class="tech-item"><span class="tech-icon">🚂</span><span>Express.js</span></div>
+        <div class="tech-item"><span class="tech-icon">🐘</span><span>PostgreSQL</span></div>
+        <div class="tech-item"><span class="tech-icon">🔷</span><span>Prisma ORM</span></div>
+        <div class="tech-item"><span class="tech-icon">🔐</span><span>JWT Auth</span></div>
+        <div class="tech-item"><span class="tech-icon">🔌</span><span>Socket.IO</span></div>
+        <div class="tech-item"><span class="tech-icon">☁️</span><span>Cloudinary</span></div>
+        <div class="tech-item"><span class="tech-icon">🗺️</span><span>Maps API</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CTA BANNER ========== -->
+  <section id="contact" class="section cta-section">
+    <div class="container">
+      <div class="cta-card" data-aos="zoom-in">
+        <div class="cta-glow"></div>
+        <div class="cta-content">
+          <h2>Ready to Transform Agricultural Trading?</h2>
+          <p>Join thousands of farmers, buyers, and transport providers already using FAM WHEEL to make agriculture more transparent, profitable, and accessible.</p>
+          <div class="cta-buttons">
+            <a href="register.html" class="btn-cta-primary">
+              <i class="fas fa-rocket"></i> Get Started Free
+            </a>
+            <a href="contact.html" class="btn-cta-outline">
+              <i class="fas fa-envelope"></i> Contact Us
+            </a>
+          </div>
+          <div class="cta-social">
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+        <div class="cta-visual">
+          <div class="cta-emoji-grid">
+            <span>🌾</span><span>🚜</span><span>🛒</span>
+            <span>🚚</span><span>📱</span><span>💰</span>
+            <span>📊</span><span>🌍</span><span>⭐</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer id="footer">
+    <div class="footer-top">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <div class="footer-logo">
+              <span class="logo-icon">🚜</span>
+              <span>FAM<span class="logo-accent">WHEEL</span></span>
+            </div>
+            <p>Connecting farmers, buyers, and transport providers in a transparent digital agricultural marketplace.</p>
+            <div class="footer-social">
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-facebook-f"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+          </div>
+          <div class="footer-col">
+            <h4>Platform</h4>
+            <ul>
+              <li><a href="#">Marketplace</a></li>
+              <li><a href="#">For Farmers</a></li>
+              <li><a href="#">For Buyers</a></li>
+              <li><a href="#">Transportation</a></li>
+              <li><a href="#">Market Prices</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Company</h4>
+            <ul>
+              <li><a href="#">About Us</a></li>
+              <li><a href="#">Blog</a></li>
+              <li><a href="#">Careers</a></li>
+              <li><a href="#">Press</a></li>
+              <li><a href="#">Contact</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Support</h4>
+            <ul>
+              <li><a href="#">Help Center</a></li>
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Terms of Service</a></li>
+              <li><a href="#">Community</a></li>
+              <li><a href="#">Status</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Get the App</h4>
+            <p style="color:#9ca3af;font-size:0.85rem;margin-bottom:1rem;">Coming Soon to iOS & Android</p>
+            <div class="app-badges">
+              <div class="app-badge"><i class="fab fa-apple"></i><div><span>Coming Soon</span><strong>App Store</strong></div></div>
+              <div class="app-badge"><i class="fab fa-google-play"></i><div><span>Coming Soon</span><strong>Google Play</strong></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        <p>© 2025 FAM WHEEL. All rights reserved. Made with ❤️ for Indian Farmers.</p>
+        <p>🚧 Currently Under Development</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========== SCROLL TO TOP ========== -->
+  <button id="scrollTop" aria-label="Scroll to top">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <!-- ========== MOBILE NAV OVERLAY ========== -->
+  <div class="mobile-nav-overlay" id="mobileNav">
+    <button class="mobile-nav-close" id="mobileClose"><i class="fas fa-times"></i></button>
+    <ul>
+      <li><a href="#features" class="mnav-link">Features</a></li>
+      <li><a href="#how-it-works" class="mnav-link">How It Works</a></li>
+      <li><a href="#roles" class="mnav-link">Roles</a></li>
+      <li><a href="#market" class="mnav-link">Market</a></li>
+      <li><a href="#testimonials" class="mnav-link">Reviews</a></li>
+      <li><a href="#contact" class="mnav-link">Contact</a></li>
+    </ul>
+    <div class="mnav-actions">
+      <a href="login.html" class="btn-outline">Login</a>
+      <a href="register.html" class="btn-primary">Get Started</a>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

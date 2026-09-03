@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Notifications – FAM WHEEL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="dashboard.css"/>
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebarContainer"></div>
+  <div class="main-content">
+    <div id="headerContainer"></div>
+    <div class="page-content">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div><h1 class="page-title">🔔 Notifications</h1><p class="page-subtitle">Stay updated on offers, orders, deliveries and more</p></div>
+        <button class="btn btn-outline" onclick="markAllRead()"><i class="fas fa-check-double"></i> Mark All Read</button>
+      </div>
+
+      <!-- FILTER TABS -->
+      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+        ${['All','Offers','Orders','Transport','Reviews','Payments','System'].map((t,i) => `
+          <button onclick="filterNotifs('${t.toLowerCase()}')" class="notif-tab" data-type="${t.toLowerCase()}" style="padding:7px 16px;border-radius:99px;border:1.5px solid ${i===0?'#22c55e':'#e5e7eb'};background:${i===0?'#22c55e':'#fff'};color:${i===0?'#fff':'#6b7280'};font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;">${t}</button>
+        `).join('')}
+      </div>
+
+      <div class="card">
+        <div id="notifList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="auth.js"></script>
+<script src="data.js"></script>
+<script src="shared-ui.js"></script>
+<script>
+const user = Auth.requireAuth();
+renderSidebar('notifications');
+renderDashHeader('🔔 Notifications', 'All your platform updates');
+
+let notifs = FamData.getNotifications(user.id);
+const typeColors = { offer:'#f0fdf4,#22c55e', order:'#dbeafe,#2563eb', transport:'#fef9c3,#d97706', review:'#f3e8ff,#9333ea', payment:'#dcfce7,#16a34a', system:'#f3f4f6,#6b7280' };
+
+function filterNotifs(type) {
+  document.querySelectorAll('.notif-tab').forEach(btn => {
+    const active = btn.dataset.type === type;
+    btn.style.background = active ? '#22c55e' : '#fff';
+    btn.style.color = active ? '#fff' : '#6b7280';
+    btn.style.borderColor = active ? '#22c55e' : '#e5e7eb';
+  });
+  const filtered = type === 'all' ? notifs : notifs.filter(n => n.type === type);
+  renderNotifs(filtered);
+}
+
+function renderNotifs(list) {
+  document.getElementById('notifList').innerHTML = list.length ? list.map(n => {
+    const [bg, accent] = (typeColors[n.type] || '#f3f4f6,#6b7280').split(',');
+    return `
+      <a href="${n.link}" onclick="markRead(${n.id})" style="display:flex;align-items:flex-start;gap:16px;padding:18px 22px;border-bottom:1px solid #f3f4f6;transition:background 0.2s;${!n.read?'background:#fafffe;':''}text-decoration:none;" onmouseover="this.style.background='${bg}'" onmouseout="this.style.background='${!n.read?'#fafffe':'#fff'}'">
+        <div style="width:46px;height:46px;border-radius:14px;background:${bg};display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;border:1px solid ${accent}20;">${n.icon}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+            <strong style="font-size:0.92rem;color:#111;font-weight:${n.read?'600':'800'};">${n.title}</strong>
+            ${!n.read ? `<div style="width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0;"></div>` : ''}
+          </div>
+          <p style="font-size:0.85rem;color:#6b7280;margin-bottom:5px;line-height:1.5;">${n.text}</p>
+          <span style="font-size:0.75rem;color:#9ca3af;"><i class="fas fa-clock"></i> ${n.time}</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+          <span style="font-size:0.7rem;background:${bg};color:${accent};padding:3px 10px;border-radius:99px;font-weight:700;text-transform:uppercase;">${n.type}</span>
+          <button onclick="event.preventDefault();deleteNotif(${n.id})" style="background:none;border:none;color:#d1d5db;cursor:pointer;font-size:0.85rem;" title="Dismiss"><i class="fas fa-times"></i></button>
+        </div>
+      </a>
+    `;
+  }).join('') : `<div class="empty-state"><div class="empty-icon">🔔</div><h3>No notifications</h3><p>You're all caught up!</p></div>`;
+}
+
+function markRead(id) {
+  const n = notifs.find(n => n.id === id);
+  if (n) n.read = true;
+}
+
+function markAllRead() {
+  notifs.forEach(n => n.read = true);
+  renderNotifs(notifs);
+  showToast('All notifications marked as read', 'success');
+}
+
+function deleteNotif(id) {
+  notifs = notifs.filter(n => n.id !== id);
+  renderNotifs(notifs);
+}
+
+renderNotifs(notifs);
+</script>
+</body>
+</html>

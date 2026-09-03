@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Orders – FAM WHEEL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="dashboard.css"/>
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebarContainer"></div>
+  <div class="main-content">
+    <div id="headerContainer"></div>
+    <div class="page-content">
+      <h1 class="page-title">📦 Orders</h1>
+      <p class="page-subtitle">Track and manage all your crop orders</p>
+
+      <!-- STATUS TABS -->
+      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+        ${['all','pending','confirmed','in_transit','delivered','cancelled'].map((s,i) => `
+          <button onclick="filterOrders('${s}')" class="status-tab" data-status="${s}" style="padding:8px 18px;border-radius:99px;border:1.5px solid ${i===0?'#22c55e':'#e5e7eb'};background:${i===0?'#22c55e':'#fff'};color:${i===0?'#fff':'#6b7280'};font-size:0.82rem;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.2s;">
+            ${s.replace('_',' ').replace(/\b\w/g,l=>l.toUpperCase())}
+          </button>
+        `).join('')}
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-row" style="margin-bottom:22px;">
+        <div class="stat-card"><div class="stat-card-info"><h4>Total Orders</h4><div class="value">5</div><div class="change pos"><i class="fas fa-arrow-up"></i> +2 this week</div></div><div class="stat-icon" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-shopping-bag"></i></div></div>
+        <div class="stat-card"><div class="stat-card-info"><h4>Delivered</h4><div class="value">2</div><div class="change pos"><i class="fas fa-check"></i> Completed</div></div><div class="stat-icon" style="background:#dcfce7;color:#22c55e;"><i class="fas fa-check-circle"></i></div></div>
+        <div class="stat-card"><div class="stat-card-info"><h4>In Transit</h4><div class="value">1</div><div class="change pos"><i class="fas fa-truck"></i> Moving</div></div><div class="stat-icon" style="background:#fef9c3;color:#d97706;"><i class="fas fa-truck"></i></div></div>
+        <div class="stat-card"><div class="stat-card-info"><h4>Total Value</h4><div class="value">₹54,100</div><div class="change pos"><i class="fas fa-arrow-up"></i> All orders</div></div><div class="stat-icon" style="background:#f3e8ff;color:#9333ea;font-size:1.2rem;">₹</div></div>
+      </div>
+
+      <!-- ORDERS TABLE -->
+      <div class="card">
+        <div class="card-header">
+          <h3>All Orders</h3>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <input type="text" id="orderSearch" placeholder="Search orders…" oninput="filterOrders(currentFilter)" style="padding:8px 14px;border:1px solid #e5e7eb;border-radius:10px;font-size:0.85rem;font-family:Inter,sans-serif;outline:none;" />
+            <button class="btn btn-primary btn-sm" onclick="showToast('Export feature coming soon!','info')"><i class="fas fa-download"></i> Export</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="ordersTable">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Crop</th>
+                <th>Farmer</th>
+                <th>Buyer</th>
+                <th>Qty</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Payment</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ordersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER DETAIL MODAL -->
+<div id="orderModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:8000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);">
+  <div style="background:#fff;border-radius:24px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;padding:32px;box-shadow:0 32px 80px rgba(0,0,0,0.2);" id="orderModalContent"></div>
+</div>
+
+<script src="auth.js"></script>
+<script src="data.js"></script>
+<script src="shared-ui.js"></script>
+<script>
+const user = Auth.requireAuth();
+renderSidebar('orders');
+renderDashHeader('📦 Orders', 'Track and manage your crop orders');
+
+let currentFilter = 'all';
+const allOrders = FamData.getOrders();
+
+function filterOrders(status) {
+  currentFilter = status;
+  const search = (document.getElementById('orderSearch')?.value || '').toLowerCase();
+  document.querySelectorAll('.status-tab').forEach(btn => {
+    const active = btn.dataset.status === status;
+    btn.style.background = active ? '#22c55e' : '#fff';
+    btn.style.color = active ? '#fff' : '#6b7280';
+    btn.style.borderColor = active ? '#22c55e' : '#e5e7eb';
+  });
+  const filtered = allOrders.filter(o => {
+    const matchStatus = status === 'all' || o.status === status;
+    const matchSearch = !search || o.id.toLowerCase().includes(search) || o.cropName.toLowerCase().includes(search) || o.buyerName.toLowerCase().includes(search) || o.farmerName.toLowerCase().includes(search);
+    return matchStatus && matchSearch;
+  });
+  renderOrders(filtered);
+}
+
+function renderOrders(orders) {
+  const body = document.getElementById('ordersBody');
+  if (!orders.length) {
+    body.innerHTML = `<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">📦</div><h3>No orders found</h3><p>Try a different filter</p></div></td></tr>`;
+    return;
+  }
+  body.innerHTML = orders.map(o => `
+    <tr>
+      <td><strong style="color:#22c55e;cursor:pointer;" onclick="viewOrder('${o.id}')">${o.id}</strong></td>
+      <td><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:1.2rem;">${o.cropEmoji}</span><div><strong>${o.cropName}</strong></div></div></td>
+      <td>${o.farmerName}</td>
+      <td>${o.buyerName}</td>
+      <td>${o.qty} ${o.unit}</td>
+      <td><strong>${FamData.formatMoney(o.totalAmount)}</strong></td>
+      <td>${FamData.statusBadge(o.status)}</td>
+      <td><span class="badge ${o.paymentStatus === 'paid' ? 'badge-green' : 'badge-yellow'}">${o.paymentStatus === 'paid' ? '✅ Paid' : '⏳ Pending'}</span></td>
+      <td style="white-space:nowrap;font-size:0.8rem;">${o.date}</td>
+      <td>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-sm btn-outline" onclick="viewOrder('${o.id}')"><i class="fas fa-eye"></i></button>
+          ${o.status === 'pending' ? `<button class="btn btn-sm btn-primary" onclick="confirmOrder('${o.id}')">Accept</button>` : ''}
+          ${o.status === 'confirmed' && !o.transportId ? `<button class="btn btn-sm" style="background:#dbeafe;color:#2563eb;border:none;cursor:pointer;border-radius:8px;padding:7px 12px;font-size:0.78rem;font-weight:600;font-family:Inter,sans-serif;" onclick="window.location.href='transport.html'"><i class="fas fa-truck"></i> Transport</button>` : ''}
+          ${o.status !== 'cancelled' && o.status !== 'delivered' ? `<button class="btn btn-sm btn-danger" onclick="cancelOrder('${o.id}')"><i class="fas fa-times"></i></button>` : ''}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function viewOrder(id) {
+  const o = allOrders.find(x => x.id === id);
+  if (!o) return;
+  const modal = document.getElementById('orderModal');
+  document.getElementById('orderModalContent').innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+      <div>
+        <h2 style="font-size:1.3rem;font-weight:800;color:#111;">${o.id}</h2>
+        <div style="font-size:0.82rem;color:#6b7280;">Placed on ${o.date}</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        ${FamData.statusBadge(o.status)}
+        <button onclick="document.getElementById('orderModal').style.display='none'" style="background:#f3f4f6;border:none;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:0.95rem;">✕</button>
+      </div>
+    </div>
+
+    <div style="background:#f0fdf4;border-radius:14px;padding:20px;margin-bottom:18px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div><div style="font-size:0.75rem;color:#6b7280;font-weight:600;margin-bottom:2px;">CROP</div><div style="font-size:1rem;font-weight:700;">${o.cropEmoji} ${o.cropName}</div></div>
+      <div><div style="font-size:0.75rem;color:#6b7280;font-weight:600;margin-bottom:2px;">QUANTITY</div><div style="font-size:1rem;font-weight:700;">${o.qty} ${o.unit}</div></div>
+      <div><div style="font-size:0.75rem;color:#6b7280;font-weight:600;margin-bottom:2px;">PRICE / UNIT</div><div style="font-size:1rem;font-weight:700;">${FamData.formatMoney(o.pricePerUnit)}</div></div>
+      <div><div style="font-size:0.75rem;color:#6b7280;font-weight:600;margin-bottom:2px;">TOTAL AMOUNT</div><div style="font-size:1.3rem;font-weight:800;color:#16a34a;">${FamData.formatMoney(o.totalAmount)}</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;">
+      <div style="background:#f9fafb;border-radius:12px;padding:16px;">
+        <div style="font-size:0.75rem;color:#9ca3af;font-weight:600;margin-bottom:8px;">FARMER</div>
+        <div style="font-size:0.87rem;font-weight:700;color:#111;">${o.farmerName}</div>
+      </div>
+      <div style="background:#f9fafb;border-radius:12px;padding:16px;">
+        <div style="font-size:0.75rem;color:#9ca3af;font-weight:600;margin-bottom:8px;">BUYER</div>
+        <div style="font-size:0.87rem;font-weight:700;color:#111;">${o.buyerName}</div>
+      </div>
+    </div>
+
+    ${o.address ? `<div style="background:#fef9c3;border-radius:12px;padding:14px;margin-bottom:16px;"><div style="font-size:0.75rem;color:#9ca3af;font-weight:600;margin-bottom:4px;">DELIVERY ADDRESS</div><div style="font-size:0.88rem;color:#374151;">${o.address}</div></div>` : ''}
+
+    <div style="background:#f9fafb;border-radius:12px;padding:14px;margin-bottom:20px;">
+      <div style="font-size:0.75rem;color:#9ca3af;font-weight:600;margin-bottom:8px;">TRANSPORT STATUS</div>
+      ${o.transportName ? `<div style="font-size:0.88rem;color:#374151;"><i class="fas fa-truck" style="color:#22c55e;"></i> ${o.transportName} · ${o.vehicle || 'Vehicle assigned'}</div>` : `<div style="color:#9ca3af;font-size:0.85rem;"><i class="fas fa-clock"></i> Transport not yet arranged</div>`}
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      ${o.status === 'pending' ? `<button class="btn btn-primary" onclick="confirmOrder('${o.id}');document.getElementById('orderModal').style.display='none'"><i class="fas fa-check"></i> Accept Order</button>` : ''}
+      <button class="btn btn-outline" onclick="window.location.href='messages.html'"><i class="fas fa-comments"></i> Message</button>
+      ${!o.transportId && o.status === 'confirmed' ? `<button class="btn" style="background:#dbeafe;color:#2563eb;border:none;cursor:pointer;border-radius:10px;padding:10px 20px;font-size:0.87rem;font-weight:600;font-family:Inter,sans-serif;" onclick="window.location.href='transport.html'"><i class="fas fa-truck"></i> Arrange Transport</button>` : ''}
+      <button class="btn btn-outline" onclick="showToast('Invoice downloading…','info')"><i class="fas fa-download"></i> Invoice</button>
+    </div>
+  `;
+  modal.style.display = 'flex';
+  modal.onclick = e => { if(e.target === modal) modal.style.display = 'none'; };
+}
+
+function confirmOrder(id) {
+  showModal({
+    title:'Accept Order',
+    body:`Confirm that you want to accept order <strong>${id}</strong>? This will notify the buyer.`,
+    confirmText:'Accept Order',
+    onConfirm: () => showToast(`Order ${id} accepted! Buyer has been notified.`, 'success')
+  });
+}
+
+function cancelOrder(id) {
+  showModal({
+    title:'Cancel Order',
+    body:`Are you sure you want to cancel order <strong>${id}</strong>? This action cannot be undone.`,
+    confirmText:'Yes, Cancel',
+    danger: true,
+    onConfirm: () => showToast(`Order ${id} cancelled.`, 'error')
+  });
+}
+
+renderOrders(allOrders);
+</script>
+</body>
+</html>

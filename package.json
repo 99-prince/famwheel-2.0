@@ -1,0 +1,15 @@
+{
+  "name": "famwheel-fullstack",
+  "version": "2.0.0",
+  "description": "FAM WHEEL Full-Stack Agricultural Marketplace",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install --prefix server && npm install --prefix client",
+    "setup": "npm run install:all && npm run db:setup",
+    "db:setup": "npm run --prefix server db:push && npm run --prefix server db:seed",
+    "dev:server": "npm run --prefix server dev",
+    "dev:client": "npm run --prefix client dev",
+    "start:server": "npm run --prefix server start",
+    "build:client": "npm run --prefix client build"
+  }
+}

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Market Dashboard – FAM WHEEL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="pages.css" />
+  <style>
+    body { background: #f3f4f6; }
+    
+    /* Sidebar toggle for mobile */
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .dashboard-main { margin-left: 0 !important; }
+      .stats-row { grid-template-columns: 1fr 1fr !important; }
+      .dash-grid-2 { grid-template-columns: 1fr !important; }
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 8px 14px;
+    }
+
+    .search-bar input {
+      border: none;
+      background: none;
+      outline: none;
+      font-size: 0.88rem;
+      font-family: Inter, sans-serif;
+      color: #374151;
+      width: 200px;
+    }
+
+    .search-bar i { color: #9ca3af; font-size: 0.85rem; }
+
+    .crop-listing-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 0;
+      border-top: 1px solid #f3f4f6;
+    }
+
+    .crop-listing-item:first-child { border-top: none; padding-top: 0; }
+
+    .cli-emoji {
+      font-size: 1.5rem;
+      width: 44px; height: 44px;
+      background: #f0fdf4;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .cli-info { flex: 1; }
+    .cli-info strong { display: block; font-size: 0.9rem; font-weight: 700; color: #111; }
+    .cli-info span { font-size: 0.78rem; color: #6b7280; }
+    .cli-price { font-size: 1rem; font-weight: 800; color: #16a34a; }
+    .cli-price small { font-size: 0.72rem; font-weight: 500; color: #9ca3af; display: block; text-align: right; }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .qa-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 18px 12px;
+      border-radius: 14px;
+      border: 1.5px solid #e5e7eb;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #374151;
+      background: #fff;
+      transition: all 0.2s;
+      font-family: Inter, sans-serif;
+      text-decoration: none;
+    }
+
+    .qa-btn i { font-size: 1.4rem; }
+    .qa-btn:hover { border-color: #22c55e; background: #f0fdf4; color: #16a34a; transform: translateY(-2px); }
+
+    .activity-list { display: flex; flex-direction: column; gap: 0; }
+    .activity-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .ai-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; flex-shrink: 0;
+    }
+    .ai-text strong { display: block; font-size: 0.85rem; font-weight: 600; color: #111; }
+    .ai-text span { font-size: 0.75rem; color: #9ca3af; }
+
+    .map-placeholder {
+      background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+      border-radius: 12px;
+      height: 180px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: #16a34a;
+    }
+    .map-placeholder i { font-size: 2.5rem; }
+    .map-placeholder p { font-size: 0.88rem; font-weight: 600; }
+    .map-placeholder small { font-size: 0.75rem; color: #22c55e; }
+  </style>
+</head>
+<body>
+
+<div class="dashboard-layout">
+
+  <!-- ── SIDEBAR ─────────────────────────── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <span>🚜</span> FAM<span class="logo-accent">WHEEL</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a class="sidebar-link active" href="market.html">
+        <i class="fas fa-th-large"></i> Dashboard
+      </a>
+      <a class="sidebar-link" href="#">
+        <i class="fas fa-seedling"></i> My Listings
+      </a>
+      <a class="sidebar-link" href="#">
+        <i class="fas fa-shopping-bag"></i> Orders
+        <span style="margin-left:auto;background:#22c55e;color:#fff;font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:99px;">3</span>
+      </a>
+      <a class="sidebar-link" href="#">
+        <i class="fas fa-handshake"></i> Offers
+      </a>
+      <a class="sidebar-link" href="#">
+        <i class="fas fa-truck"></i> Transport
+      </a>
+      <div class="nav-section-label" style="margin-top:12px;">Market</div>
+      <a class="sidebar-link" href="#">
+        <i class="fas fa-chart-line"></i> Price Trends
+      </a>
+      <a class="sidebar-link" href="#">
+        <i class="fas fa-search"></i> Browse Crops
+      </a>
+      <a class="sidebar-link" href="#">
+        <i class="fas fa-map-marker-alt"></i> Nearby Farms
+      </a>
+      <div class="nav-section-label" style="margin-top:12px;">Account</div>
+      <a class="sidebar-link" href="#">
+        <i class="fas fa-comments"></i> Messages
+        <span style="margin-left:auto;background:#ef4444;color:#fff;font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:99px;">5</span>
+      </a>
+      <a class="sidebar-link" href="#">
+        <i class="fas fa-star"></i> Reviews
+      </a>
+      <a class="sidebar-link" href="#">
+        <i class="fas fa-user-cog"></i> Profile
+      </a>
+      <a class="sidebar-link" href="#">
+        <i class="fas fa-bell"></i> Notifications
+      </a>
+    </nav>
+    <div style="padding:16px 24px;border-top:1px solid rgba(255,255,255,0.07);margin-top:auto;">
+      <a class="sidebar-link" href="index.html" style="padding:0;gap:10px;">
+        <i class="fas fa-home"></i> Back to Home
+      </a>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ───────────────────────────── -->
+  <div class="dashboard-main">
+
+    <!-- Dash Header -->
+    <header class="dash-header">
+      <div class="dash-header-left">
+        <h2>Good Morning, Rajesh 👨‍🌾</h2>
+        <p>Saturday, 23 August 2026 · Punjab, India</p>
+      </div>
+      <div class="dash-header-right">
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search crops, buyers…" />
+        </div>
+        <div class="dash-notif">
+          <i class="fas fa-bell"></i>
+          <div class="notif-dot"></div>
+        </div>
+        <div class="dash-user">
+          <div class="dash-avatar">R</div>
+          <span class="dash-user-name">Rajesh K.</span>
+          <i class="fas fa-chevron-down" style="font-size:0.7rem;color:#9ca3af;"></i>
+        </div>
+      </div>
+    </header>
+
+    <!-- Dash Content -->
+    <div class="dash-content">
+
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-card-info">
+            <h3>Total Revenue</h3>
+            <div class="value">₹1,24,500</div>
+            <div class="change pos"><i class="fas fa-arrow-up"></i> +18.4% this month</div>
+          </div>
+          <div class="stat-card-icon" style="background:#dcfce7;color:#22c55e;">
+            <i class="fas fa-indian-rupee-sign"></i>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-info">
+            <h3>Active Listings</h3>
+            <div class="value">12</div>
+            <div class="change pos"><i class="fas fa-arrow-up"></i> +3 new this week</div>
+          </div>
+          <div class="stat-card-icon" style="background:#fef9c3;color:#d97706;">
+            <i class="fas fa-seedling"></i>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-info">
+            <h3>Pending Orders</h3>
+            <div class="value">7</div>
+            <div class="change neg"><i class="fas fa-clock"></i> 2 need action</div>
+          </div>
+          <div class="stat-card-icon" style="background:#dbeafe;color:#2563eb;">
+            <i class="fas fa-shopping-bag"></i>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-info">
+            <h3>Buyer Offers</h3>
+            <div class="value">24</div>
+            <div class="change pos"><i class="fas fa-arrow-up"></i> +8 new today</div>
+          </div>
+          <div class="stat-card-icon" style="background:#f3e8ff;color:#9333ea;">
+            <i class="fas fa-handshake"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Revenue Chart + Quick Actions -->
+      <div class="dash-grid-2">
+        <!-- Revenue Chart -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h3>Revenue Overview</h3>
+            <div style="display:flex;gap:8px;">
+              <span style="font-size:0.78rem;background:#f0fdf4;color:#16a34a;padding:4px 10px;border-radius:99px;font-weight:600;cursor:pointer;">Weekly</span>
+              <span style="font-size:0.78rem;color:#9ca3af;padding:4px 10px;cursor:pointer;">Monthly</span>
+            </div>
+          </div>
+          <div class="dash-card-body">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+              <div>
+                <div style="font-size:1.6rem;font-weight:800;color:#111;">₹34,200</div>
+                <div style="font-size:0.8rem;color:#22c55e;font-weight:600;"><i class="fas fa-arrow-up"></i> 12.5% vs last week</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:0.78rem;color:#9ca3af;">Avg / day</div>
+                <div style="font-size:1rem;font-weight:700;color:#374151;">₹4,885</div>
+              </div>
+            </div>
+            <div class="chart-bars">
+              <div class="chart-bar-wrap">
+                <div class="chart-bar" style="height:0%"></div>
+                <span class="chart-label">Mon</span>
+              </div>
+              <div class="chart-bar-wrap">
+                <div class="chart-bar" style="height:0%"></div>
+                <span class="chart-label">Tue</span>
+              </div>
+              <div class="chart-bar-wrap">
+                <div class="chart-bar" style="height:0%"></div>
+                <span class="chart-label">Wed</span>
+              </div>
+              <div class="chart-bar-wrap">
+                <div class="chart-bar" style="height:0%"></div>
+                <span class="chart-label">Thu</span>
+              </div>
+              <div class="chart-bar-wrap">
+                <div class="chart-bar" style="height:0%"></div>
+                <span class="chart-label">Fri</span>
+              </div>
+              <div class="chart-bar-wrap">
+                <div class="chart-bar" style="height:0%;background:linear-gradient(180deg,#fbbf24,#d97706)"></div>
+                <span class="chart-label">Sat</span>
+              </div>
+              <div class="chart-bar-wrap">
+                <div class="chart-bar" style="height:0%;background:linear-gradient(180deg,#d1d5db,#9ca3af)"></div>
+                <span class="chart-label">Sun</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions + Map -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div class="dash-card">
+            <div class="dash-card-header"><h3>Quick Actions</h3></div>
+            <div class="dash-card-body">
+              <div class="quick-actions">
+                <a href="#" class="qa-btn" style="color:#16a34a;">
+                  <i class="fas fa-plus-circle" style="color:#22c55e;"></i> Add Listing
+                </a>
+                <a href="#" class="qa-btn" style="color:#2563eb;">
+                  <i class="fas fa-truck" style="color:#3b82f6;"></i> Request Transport
+                </a>
+                <a href="#" class="qa-btn" style="color:#9333ea;">
+                  <i class="fas fa-comments" style="color:#a855f7;"></i> Messages
+                </a>
+                <a href="#" class="qa-btn" style="color:#d97706;">
+                  <i class="fas fa-chart-bar" style="color:#f59e0b;"></i> Analytics
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="dash-card">
+            <div class="dash-card-header"><h3>Your Location</h3></div>
+            <div class="dash-card-body">
+              <div class="map-placeholder">
+                <i class="fas fa-map-marker-alt"></i>
+                <p>Ludhiana, Punjab</p>
+                <small>Tap to view nearby buyers & transport</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Orders Table + Active Listings -->
+      <div class="dash-grid-2" style="margin-top:24px;">
+
+        <!-- Recent Orders -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h3>Recent Orders</h3>
+            <a href="#">View all</a>
+          </div>
+          <div class="dash-card-body" style="padding-top:8px;">
+            <table class="orders-table">
+              <thead>
+                <tr>
+                  <th>Crop</th>
+                  <th>Buyer</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><div class="order-crop"><span class="order-emoji">🌾</span> Wheat (5 qtl)</div></td>
+                  <td>Priya S.</td>
+                  <td style="font-weight:700;color:#111;">₹10,500</td>
+                  <td><span class="badge badge-green">Delivered</span></td>
+                </tr>
+                <tr>
+                  <td><div class="order-crop"><span class="order-emoji">🍅</span> Tomato (100 kg)</div></td>
+                  <td>Anil M.</td>
+                  <td style="font-weight:700;color:#111;">₹4,500</td>
+                  <td><span class="badge badge-yellow">In Transit</span></td>
+                </tr>
+                <tr>
+                  <td><div class="order-crop"><span class="order-emoji">🧅</span> Onion (200 kg)</div></td>
+                  <td>Mohan V.</td>
+                  <td style="font-weight:700;color:#111;">₹6,000</td>
+                  <td><span class="badge badge-blue">Confirmed</span></td>
+                </tr>
+                <tr>
+                  <td><div class="order-crop"><span class="order-emoji">🥔</span> Potato (50 kg)</div></td>
+                  <td>Sunita R.</td>
+                  <td style="font-weight:700;color:#111;">₹1,100</td>
+                  <td><span class="badge badge-yellow">Pending</span></td>
+                </tr>
+                <tr>
+                  <td><div class="order-crop"><span class="order-emoji">🌽</span> Maize (3 qtl)</div></td>
+                  <td>Kiran D.</td>
+                  <td style="font-weight:700;color:#111;">₹5,400</td>
+                  <td><span class="badge badge-red">Cancelled</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+
+          <!-- Active Listings -->
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <h3>Active Listings</h3>
+              <a href="#">+ Add New</a>
+            </div>
+            <div class="dash-card-body" style="padding-top:8px;">
+              <div class="crop-listing-item">
+                <div class="cli-emoji">🌾</div>
+                <div class="cli-info">
+                  <strong>Wheat — Grade A</strong>
+                  <span>20 quintals available</span>
+                </div>
+                <div class="cli-price">₹2,100<small>/qtl</small></div>
+              </div>
+              <div class="crop-listing-item">
+                <div class="cli-emoji">🍅</div>
+                <div class="cli-info">
+                  <strong>Tomatoes — Fresh</strong>
+                  <span>500 kg available</span>
+                </div>
+                <div class="cli-price">₹45<small>/kg</small></div>
+              </div>
+              <div class="crop-listing-item">
+                <div class="cli-emoji">🧅</div>
+                <div class="cli-info">
+                  <strong>Onions — Red</strong>
+                  <span>1000 kg available</span>
+                </div>
+                <div class="cli-price">₹30<small>/kg</small></div>
+              </div>
+              <div class="crop-listing-item">
+                <div class="cli-emoji">🌽</div>
+                <div class="cli-info">
+                  <strong>Maize — Yellow</strong>
+                  <span>10 quintals available</span>
+                </div>
+                <div class="cli-price">₹1,800<small>/qtl</small></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <h3>Recent Activity</h3>
+            </div>
+            <div class="dash-card-body" style="padding-top:4px;">
+              <div class="activity-list">
+                <div class="activity-item">
+                  <div class="ai-icon" style="background:#dcfce7;color:#16a34a;"><i class="fas fa-check"></i></div>
+                  <div class="ai-text">
+                    <strong>Order #1204 delivered</strong>
+                    <span>Wheat to Priya Sharma · 2h ago</span>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="ai-icon" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-handshake"></i></div>
+                  <div class="ai-text">
+                    <strong>New offer received</strong>
+                    <span>₹2,050/qtl for Wheat · 4h ago</span>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="ai-icon" style="background:#fef9c3;color:#d97706;"><i class="fas fa-truck"></i></div>
+                  <div class="ai-text">
+                    <strong>Transport assigned</strong>
+                    <span>Order #1203 · Mohan Singh · 6h ago</span>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="ai-icon" style="background:#f3e8ff;color:#9333ea;"><i class="fas fa-star"></i></div>
+                  <div class="ai-text">
+                    <strong>New review: ★★★★★</strong>
+                    <span>"Fresh and on time" · Anil Mehta · 1d ago</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /dash-content -->
+  </div><!-- /dashboard-main -->
+</div><!-- /dashboard-layout -->
+
+<script src="app.js"></script>
+<script>
+  // Animate chart bars on load
+  document.addEventListener('DOMContentLoaded', () => {
+    const heights = [40, 65, 50, 80, 60, 90, 30];
+    document.querySelectorAll('.chart-bar').forEach((bar, i) => {
+      setTimeout(() => {
+        bar.style.transition = 'height 0.8s cubic-bezier(0.4,0,0.2,1)';
+        bar.style.height = heights[i] + '%';
+      }, 300 + i * 100);
+    });
+  });
+
+  // Mobile sidebar toggle
+  const sidebarEl = document.getElementById('sidebar');
+  // Add hamburger to header for mobile
+  const dashHeader = document.querySelector('.dash-header');
+  if (window.innerWidth <= 768 && dashHeader) {
+    const menuBtn = document.createElement('button');
+    menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+    menuBtn.style.cssText = 'background:none;border:none;font-size:1.2rem;cursor:pointer;color:#374151;margin-right:12px;';
+    menuBtn.onclick = () => sidebarEl.classList.toggle('open');
+    dashHeader.querySelector('.dash-header-left').prepend(menuBtn);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+// This is your Prisma schema file
+// Learn more at https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"  // Change to "postgresql" for production
+  url      = env("DATABASE_URL")
+}
+
+// ── USER ──────────────────────────────────────────────────────────────────────
+model User {
+  id          Int       @id @default(autoincrement())
+  firstName   String
+  lastName    String
+  email       String    @unique
+  password    String
+  phone       String?
+  role        Role      @default(FARMER)
+  state       String?
+  city        String?
+  bio         String?
+  avatar      String?
+  verified    Boolean   @default(false)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  crops             Crop[]
+  ordersAsFarmer    Order[]      @relation("FarmerOrders")
+  ordersAsBuyer     Order[]      @relation("BuyerOrders")
+  offersReceived    Offer[]      @relation("OffersToUser")
+  offersSent        Offer[]      @relation("OffersFromUser")
+  sentMessages      Message[]    @relation("SentMessages")
+  receivedMessages  Message[]    @relation("ReceivedMessages")
+  reviewsGiven      Review[]     @relation("ReviewsGiven")
+  reviewsReceived   Review[]     @relation("ReviewsReceived")
+  notifications     Notification[]
+  transportProvider TransportProvider?
+
+  @@map("users")
+}
+
+enum Role {
+  FARMER
+  BUYER
+  TRANSPORT
+  ADMIN
+}
+
+// ── CROP ──────────────────────────────────────────────────────────────────────
+model Crop {
+  id          Int       @id @default(autoincrement())
+  name        String
+  emoji       String    @default("🌱")
+  category    Category  @default(VEGETABLE)
+  quality     String    @default("Grade A")
+  description String
+  price       Float
+  unit        String    @default("kg")
+  quantity    Float
+  minOrderQty Float     @default(1)
+  images      String    @default("[]") // JSON array of URLs
+  isAvailable Boolean   @default(true)
+  farmerId    Int
+  farmer      User      @relation(fields: [farmerId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  orders Order[]
+  offers Offer[]
+
+  @@map("crops")
+}
+
+enum Category {
+  GRAIN
+  VEGETABLE
+  FRUIT
+  PULSE
+  OILSEED
+  SPICE
+  DAIRY
+  OTHER
+}
+
+// ── ORDER ─────────────────────────────────────────────────────────────────────
+model Order {
+  id              String      @id @default(cuid())
+  cropId          Int
+  crop            Crop        @relation(fields: [cropId], references: [id])
+  farmerId        Int
+  farmer          User        @relation("FarmerOrders", fields: [farmerId], references: [id])
+  buyerId         Int
+  buyer           User        @relation("BuyerOrders", fields: [buyerId], references: [id])
+  quantity        Float
+  pricePerUnit    Float
+  totalAmount     Float
+  status          OrderStatus @default(PENDING)
+  paymentStatus   PayStatus   @default(PENDING)
+  deliveryAddress String?
+  notes           String?
+  deliveryDate    DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relations
+  transport TransportRequest?
+
+  @@map("orders")
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  IN_TRANSIT
+  DELIVERED
+  CANCELLED
+}
+
+enum PayStatus {
+  PENDING
+  PAID
+  REFUNDED
+}
+
+// ── OFFER ─────────────────────────────────────────────────────────────────────
+model Offer {
+  id          Int         @id @default(autoincrement())
+  cropId      Int
+  crop        Crop        @relation(fields: [cropId], references: [id])
+  fromId      Int
+  from        User        @relation("OffersFromUser", fields: [fromId], references: [id])
+  toId        Int
+  to          User        @relation("OffersToUser", fields: [toId], references: [id])
+  offerPrice  Float
+  quantity    Float
+  totalAmount Float
+  message     String?
+  status      OfferStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("offers")
+}
+
+enum OfferStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COUNTERED
+  EXPIRED
+}
+
+// ── TRANSPORT PROVIDER ────────────────────────────────────────────────────────
+model TransportProvider {
+  id           Int       @id @default(autoincrement())
+  userId       Int       @unique
+  user         User      @relation(fields: [userId], references: [id])
+  vehicleType  String
+  vehicleNo    String
+  capacity     Float     // in kg
+  isAvailable  Boolean   @default(true)
+  currentLoc   String?
+  createdAt    DateTime  @default(now())
+
+  requests TransportRequest[]
+
+  @@map("transport_providers")
+}
+
+// ── TRANSPORT REQUEST ─────────────────────────────────────────────────────────
+model TransportRequest {
+  id           Int              @id @default(autoincrement())
+  orderId      String           @unique
+  order        Order            @relation(fields: [orderId], references: [id])
+  fromLocation String
+  toLocation   String
+  distance     Float?
+  weight       Float?
+  requiredBy   DateTime?
+  status       TransportStatus  @default(OPEN)
+  providerId   Int?
+  provider     TransportProvider? @relation(fields: [providerId], references: [id])
+  bidAmount    Float?
+  notes        String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@map("transport_requests")
+}
+
+enum TransportStatus {
+  OPEN
+  BIDDING
+  ASSIGNED
+  PICKED_UP
+  DELIVERED
+  CANCELLED
+}
+
+// ── MESSAGE ───────────────────────────────────────────────────────────────────
+model Message {
+  id         Int      @id @default(autoincrement())
+  fromId     Int
+  from       User     @relation("SentMessages", fields: [fromId], references: [id])
+  toId       Int
+  to         User     @relation("ReceivedMessages", fields: [toId], references: [id])
+  text       String
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@map("messages")
+}
+
+// ── REVIEW ────────────────────────────────────────────────────────────────────
+model Review {
+  id         Int      @id @default(autoincrement())
+  fromId     Int
+  from       User     @relation("ReviewsGiven", fields: [fromId], references: [id])
+  toId       Int
+  to         User     @relation("ReviewsReceived", fields: [toId], references: [id])
+  rating     Int      // 1-5
+  comment    String
+  cropName   String?
+  orderId    String?
+  createdAt  DateTime @default(now())
+
+  @@map("reviews")
+}
+
+// ── NOTIFICATION ──────────────────────────────────────────────────────────────
+model Notification {
+  id        Int              @id @default(autoincrement())
+  userId    Int
+  user      User             @relation(fields: [userId], references: [id])
+  type      NotificationType @default(SYSTEM)
+  title     String
+  text      String
+  icon      String           @default("🔔")
+  link      String?
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  OFFER
+  ORDER
+  TRANSPORT
+  REVIEW
+  PAYMENT
+  SYSTEM
+}
+
+// ── MARKET PRICE ──────────────────────────────────────────────────────────────
+model MarketPrice {
+  id        Int      @id @default(autoincrement())
+  name      String
+  emoji     String
+  category  String
+  region    String
+  price     Float
+  unit      String
+  minPrice  Float
+  maxPrice  Float
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@map("market_prices")
+}
