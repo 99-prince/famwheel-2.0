@@ -190,6 +190,9 @@ npx prisma studio     # Opens at http://localhost:5555
 | [Render](https://render.com) | Alternative to Railway |
 | [Supabase](https://supabase.com) | Managed PostgreSQL + Auth |
 
+### Render deployment
+The repository includes [`render.yaml`](./render.yaml) for a Render Blueprint. In Render, choose **New > Blueprint** and select this repository. Before deploying, add SMTP and Cloudinary environment variables to `famwheel-api`; Render generates the database URL and JWT/payment secrets from the blueprint.
+
 ### Production configuration checklist
 1. Set `NODE_ENV=production` and configure every variable in `server/.env.example`.
 2. Set `VITE_API_URL` in `client/.env` to the public HTTPS API URL when the API is hosted separately.
