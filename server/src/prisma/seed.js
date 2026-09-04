@@ -8,6 +8,9 @@ const bcrypt = require('bcryptjs');
 const prisma = new PrismaClient();
 
 async function main() {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('Development seed is disabled in production');
+  }
   console.log('🌱 Seeding FAM WHEEL database...');
 
   // ── USERS ────────────────────────────────────────

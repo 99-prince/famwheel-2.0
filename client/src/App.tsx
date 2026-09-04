@@ -20,6 +20,7 @@ import TransportPage  from '@/pages/transport/TransportPage';
 import MarketPricesPage from '@/pages/market-prices/MarketPricesPage';
 import NotificationsPage from '@/pages/notifications/NotificationsPage';
 import ProfilePage    from '@/pages/profile/ProfilePage';
+import LandingPage    from '@/pages/LandingPage';
 
 // Guards
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -47,8 +48,8 @@ export default function App() {
 
   return (
     <Routes>
-      {/* Root redirect */}
-      <Route path="/" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />} />
+      {/* Public landing page */}
+      <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
 
       {/* Auth routes */}
       <Route element={<AuthLayout />}>

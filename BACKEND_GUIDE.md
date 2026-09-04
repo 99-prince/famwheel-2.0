@@ -31,16 +31,14 @@ This creates the configured PostgreSQL schema with all tables. Set `DATABASE_URL
 
 ---
 
-## Step 4: Seed Demo Data
+## Step 4: Optional development seed
 
 ```bash
 node src/prisma/seed.js
 ```
 
-This fills the database with:
-- 5 demo users (farmer, buyer, transport, admin, extra farmers)
-- 10+ crop listings
-- Sample orders, offers, messages, reviews, market prices
+This fills a development database with sample users and marketplace records.
+Never run this command against your production database.
 
 ---
 
@@ -72,12 +70,12 @@ Open browser or Postman:
 | GET http://localhost:5000/api/crops | All crops (public) |
 | GET http://localhost:5000/api/market-prices | Market prices |
 
-### Quick Login Test (Postman / Thunder Client):
+### Quick Login Test (development only):
 ```
 POST http://localhost:5000/api/auth/login
 Content-Type: application/json
 
-{ "email": "farmer@demo.com", "password": "demo123" }
+{ "email": "your-account@example.com", "password": "your-password" }
 ```
 
 ---
@@ -208,11 +206,7 @@ Opens at http://localhost:5555
 
 ---
 
-## Demo Accounts
+## Accounts
 
-| Role | Email | Password |
-|------|-------|----------|
-| 👨‍🌾 Farmer | farmer@demo.com | demo123 |
-| 🛒 Buyer | buyer@demo.com | demo123 |
-| 🚚 Transport | transport@demo.com | demo123 |
-| 👨‍💼 Admin | admin@demo.com | admin123 |
+Users register through the public frontend. Admin accounts should be provisioned
+by an existing administrator or directly in the protected database.

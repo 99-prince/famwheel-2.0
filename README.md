@@ -26,7 +26,7 @@ FAM_WHEEL_2.0/
 │   │   ├── routes/         ← auth, crops, orders, offers, messages, transport...
 │   │   ├── middleware/      ← JWT authentication middleware
 │   │   └── prisma/
-│   │       └── seed.js     ← Demo data seed script
+│   │       └── seed.js     ← Optional development seed script
 │   └── package.json
 │
 ├── 📂 (Original HTML version – still works!)
@@ -59,7 +59,7 @@ This will:
 1. Install all npm packages (server + client)
 2. Generate Prisma client
 3. Initialize the configured PostgreSQL database
-4. Seed demo data
+4. Optionally seed development data (never against production)
 
 ### Step 2 — Start Development Servers
 ```batch
@@ -81,14 +81,10 @@ http://localhost:5173
 
 ---
 
-## 🔑 Demo Accounts
+## Accounts
 
-| Role | Email | Password |
-|------|-------|----------|
-| 👨‍🌾 Farmer | farmer@demo.com | demo123 |
-| 🛒 Buyer | buyer@demo.com | demo123 |
-| 🚚 Transport | transport@demo.com | demo123 |
-| 👨‍💼 Admin | admin@demo.com | admin123 |
+Create a real account from the public registration page. Administrator accounts
+must be provisioned securely and cannot be created through public registration.
 
 ---
 

@@ -12,13 +12,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showPwd, setShowPwd] = useState(false);
 
-  const demoAccounts = [
-    { icon: '👨‍🌾', label: 'Farmer',    email: 'farmer@demo.com',    password: 'demo123' },
-    { icon: '🛒',   label: 'Buyer',     email: 'buyer@demo.com',     password: 'demo123' },
-    { icon: '🚚',   label: 'Transport', email: 'transport@demo.com', password: 'demo123' },
-    { icon: '👨‍💼', label: 'Admin',     email: 'admin@demo.com',     password: 'admin123' },
-  ];
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.email || !form.password) { toast.error('Please fill all fields'); return; }
@@ -30,16 +23,11 @@ export default function LoginPage() {
       toast.success(`Welcome back, ${data.user.firstName}! 🚜`);
       navigate('/dashboard');
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Login failed. Try a demo account!';
+      const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Login failed. Check your email and password.';
       toast.error(msg);
     } finally {
       setLoading(false);
     }
-  }
-
-  function fillDemo(email: string, password: string) {
-    setForm({ email, password });
-    setTimeout(() => handleSubmit({ preventDefault: () => {} } as React.FormEvent), 100);
   }
 
   return (
@@ -61,25 +49,6 @@ export default function LoginPage() {
             Connect directly with farmers, buyers, and transport providers. Transparent prices, no middlemen, fair trade for all.
           </p>
 
-          <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-4">👇 Quick Demo Login</p>
-          <div className="flex flex-col gap-3">
-            {demoAccounts.map(a => (
-              <button
-                key={a.email}
-                onClick={() => fillDemo(a.email, a.password)}
-                className="flex items-center gap-3.5 bg-white/5 border border-white/10 hover:bg-green-500/15 hover:border-green-500/30 rounded-2xl px-4 py-3.5 text-left transition-all group"
-              >
-                <div className="w-10 h-10 bg-white/8 rounded-xl flex items-center justify-center text-xl flex-shrink-0 group-hover:scale-110 transition-transform">
-                  {a.icon}
-                </div>
-                <div>
-                  <div className="text-sm font-bold text-white">Login as {a.label}</div>
-                  <div className="text-xs text-white/40">{a.email}</div>
-                </div>
-                <i className="fas fa-arrow-right text-white/20 ml-auto text-sm group-hover:text-green-400 transition-colors" />
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* Stats */}
@@ -102,16 +71,6 @@ export default function LoginPage() {
 
           <h2 className="text-3xl font-black text-gray-900 mb-1">Sign In 👋</h2>
           <p className="text-gray-500 text-sm mb-8">Enter your credentials to access your dashboard</p>
-
-          {/* Mobile demo btns */}
-          <div className="lg:hidden grid grid-cols-2 gap-2 mb-6">
-            {demoAccounts.slice(0,2).map(a => (
-              <button key={a.email} onClick={() => fillDemo(a.email, a.password)}
-                className="text-xs font-semibold py-2 px-3 bg-green-50 border border-green-200 rounded-xl text-green-700 hover:bg-green-100 transition-colors">
-                {a.icon} {a.label}
-              </button>
-            ))}
-          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
